@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Hotels</title>
+</head><body>
+
+    <h2>Our Hotels</h2>
+
+    {% if hotels %}
+        <ul>
+            {% for hotel in hotels %}
+                <li>
+                    <strong>
+                        <a href="{% url 'hotel-detail' hotel.hotel_id %}">
+                            {{ hotel.name }}
+                        </a>
+                    </strong> - {{ hotel.city }}, {{ hotel.state }}
+                    <p>Rating: {{ hotel.rating }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hotels are available at this time.</p>
+    {% endif %}
+
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+
+</body>
+</html>

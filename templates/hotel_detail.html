@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ hotel.name }} Details</title>
+</head>
+<body>
+
+    <a href="{% url 'hotel-list' %}">&larr; Back to All Hotels</a>
+
+    <h1>{{ hotel.name }}</h1>
+    <p><strong>City:</strong> {{ hotel.city }}, {{ hotel.state }}</p>
+    <p><strong>Rating:</strong> {{ hotel.rating }} / 5.0</p>
+    <p><strong>Description:</strong> {{ hotel.description }}</p>
+
+    <hr>
+
+    <h2>Available Rooms</h2>
+    {% if rooms %}
+        <ul>
+            {% for room in rooms %}
+                <li>
+                    <strong>Room {{ room.room_number }} ({{ room.roomtype }})</strong>
+                    <p>Capacity: {{ room.capacity }}</p>
+                    <p>Price: ${{ room.price }} per night</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no rooms listed for this hotel.</p>
+    {% endif %}
+
+</body>
+</html>

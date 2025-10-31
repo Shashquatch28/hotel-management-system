@@ -8,12 +8,18 @@
 
     {% if user.is_authenticated %}
         <p>Hello, {{ user.first_name }}! ({{ user.email }})</p>
+
+        <p>
+            <a href="{% url 'hotel-list' %}">View All Hotels</a>
+        </p>
+
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
             {% csrf_token %}
             <button type="submit" style="background:none; border:none; padding:0; color:blue; text-decoration:underline; cursor:pointer;">
                 Logout
             </button>
         </form>
+        
     {% else %}
         <p>You are not logged in.</p>
         <p><a href="{% url 'login' %}">Login</a></p>
