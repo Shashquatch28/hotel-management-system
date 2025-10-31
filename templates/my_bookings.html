@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookings</title>
+</head>
+<body>
+    <a href="{% url 'home' %}">&larr; Back to Home</a>
+
+    <h2>My Bookings</h2>
+
+    {% if bookings %}
+        <ul>
+            {% for booking in bookings %}
+                <li>
+                    <strong>Booking ID: {{ booking.booking_id }}</strong>
+                    <p>Hotel ID: {{ booking.hotel_id }} | Room: {{ booking.room_number }}</p>
+                    <p>Check-in: {{ booking.checkin }}</p>
+                    <p>Check-out: {{ booking.checkout }}</p>
+                    <p>Status: {{ booking.status }}</p>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have not made any bookings yet.</p>
+    {% endif %}
+
+</body>
+</html>

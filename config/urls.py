@@ -30,4 +30,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'), # URL for Login
     path('hotels/', booking_views.hotel_list, name='hotel-list'),
     path('hotels/<int:hotel_id>/', booking_views.hotel_detail, name='hotel-detail'), # URL for Hotel View
+    path('my-bookings/', booking_views.my_bookings, name='my-bookings'), # URL for Bookings
 ]

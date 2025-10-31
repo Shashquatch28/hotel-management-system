@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .forms import CustomerCreationForm
-from .models import Hotel, Room
+from .models import Hotel, Room, Booking
 
 # Home View
 def home(request):
@@ -47,3 +48,15 @@ def hotel_detail(request, hotel_id):
         'rooms': rooms,
     }
     return render(request, 'hotel_detail.html', context)
+
+# Protected Booking View
+@login_required
+def my_bookings(request):
+    # This filters the Booking table to get only the ones
+    # where 'cust' is the same as the user making the request.
+    bookings = Booking.objects.filter(cust=request.user)
+    
+    context = {
+        'bookings': bookings
+    }
+    return render(request, 'my_bookings.html', context)
