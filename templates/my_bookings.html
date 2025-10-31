@@ -17,6 +17,11 @@
                     <p>Check-in: {{ booking.checkin }}</p>
                     <p>Check-out: {{ booking.checkout }}</p>
                     <p>Status: {{ booking.status }}</p>
+                    <p>
+                        <a href="{% url 'cancel-booking' booking.booking_id %}">
+                            Cancel this booking
+                        </a>
+                    </p>
                 </li>
                 <hr>
             {% endfor %}

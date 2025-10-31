@@ -22,16 +22,28 @@ from booking import views as booking_views
 
 urlpatterns = [
     path("admin/", admin.site.urls), # URL for Admin 
+
     path('register/', booking_views.register, name='register'), # URL for User Registration
+
     path('', booking_views.home, name='home'), 
+
     path('login/', auth_views.LoginView.as_view(
         template_name='login.html' 
     ), name='login'),
+
     path('logout/', auth_views.LogoutView.as_view(), name='logout'), # URL for Login
+
     path('hotels/', booking_views.hotel_list, name='hotel-list'),
+
     path('hotels/<int:hotel_id>/', booking_views.hotel_detail, name='hotel-detail'), # URL for Hotel View
+    
     path('my-bookings/', booking_views.my_bookings, name='my-bookings'), # URL for Bookings
+
     path('book-room/<int:hotel_id>/<str:room_number>/', 
          booking_views.create_booking, 
          name='create-booking'),  # URL for Creating Bookings
+
+    path('cancel-booking/<int:booking_id>/', 
+         booking_views.cancel_booking, 
+         name='cancel-booking'), # URL for Deleting Bookings
 ]

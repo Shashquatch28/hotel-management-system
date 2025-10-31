@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Cancellation</title>
+</head>
+<body>
+    <h2>Confirm Cancellation</h2>
+    <p>Are you sure you want to cancel your booking for Room {{ booking.room_number }} from {{ booking.checkin }} to {{ booking.checkout }}?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Yes, Cancel</button>
+        <a href="{% url 'my-bookings' %}">No, Go Back</a>
+    </form>
+</body>
+</html>

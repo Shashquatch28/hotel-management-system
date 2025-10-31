@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from .forms import CustomerCreationForm, BookingForm
 from .models import Hotel, Room, Booking
 import datetime
@@ -93,3 +94,26 @@ def create_booking(request, hotel_id, room_number):
         'room': room,
     }
     return render(request, 'create_booking.html', context)
+
+# View to Cancel Booking
+@login_required
+def cancel_booking(request, booking_id):
+    # Find the booking
+    booking = get_object_or_404(Booking, pk=booking_id)
+    
+    # CRITICAL: Check if the logged-in user is the owner
+    if booking.cust != request.user:
+        # If not, return a "Forbidden" error
+        return HttpResponseForbidden("You are not allowed to cancel this booking.")
+
+    # We only want to delete if the form is POSTed
+    if request.method == 'POST':
+        booking.delete()
+        # Redirect back to the list of bookings
+        return redirect('my-bookings')
+    
+    # If it's a GET request, just show a confirmation page
+    context = {
+        'booking': booking
+    }
+    return render(request, 'cancel_booking.html', context)
