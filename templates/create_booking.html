@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Room</title>
+</head>
+<body>
+    <a href="{% url 'hotel-detail' room.hotel_id %}">&larr; Back to Hotel</a>
+
+    <h2>Book Room: {{ room.room_number }} at {{ room.hotel.name }}</h2>
+    <p>Price: ${{ room.price }} per night</p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <button type="submit">Confirm Booking</button>
+    </form>
+
+</body>
+</html>

@@ -22,6 +22,12 @@
                     <strong>Room {{ room.room_number }} ({{ room.roomtype }})</strong>
                     <p>Capacity: {{ room.capacity }}</p>
                     <p>Price: ${{ room.price }} per night</p>
+                    
+                    <p>
+                        <a href="{% url 'create-booking' room.hotel_id room.room_number %}">
+                            Book Now
+                        </a>
+                    </p>
                 </li>
             {% endfor %}
         </ul>
