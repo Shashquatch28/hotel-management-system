@@ -18,6 +18,9 @@
                     <p>Check-out: {{ booking.checkout }}</p>
                     <p>Status: {{ booking.status }}</p>
                     <p>
+                        <a href="{% url 'edit-booking' booking.booking_id %}">
+                            Edit
+                        </a>
                         <a href="{% url 'cancel-booking' booking.booking_id %}">
                             Cancel this booking
                         </a>

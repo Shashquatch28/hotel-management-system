@@ -117,3 +117,30 @@ def cancel_booking(request, booking_id):
         'booking': booking
     }
     return render(request, 'cancel_booking.html', context)
+
+# Edit View
+@login_required
+def edit_booking(request, booking_id):
+    # Find the existing booking
+    booking = get_object_or_404(Booking, pk=booking_id)
+
+    # Check if the logged-in user is the owner
+    if booking.cust != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this booking.")
+
+    if request.method == 'POST':
+        # Load the form with the new POST data AND the existing booking instance
+        form = BookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save() # Save the changes to the existing object
+            return redirect('my-bookings')
+    else:
+        # Load the form with the existing booking's data
+        # This is what pre-populates the fields
+        form = BookingForm(instance=booking)
+
+    context = {
+        'form': form,
+        'booking': booking
+    }
+    return render(request, 'edit_booking.html', context)

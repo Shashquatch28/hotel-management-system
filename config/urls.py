@@ -46,4 +46,8 @@ urlpatterns = [
     path('cancel-booking/<int:booking_id>/', 
          booking_views.cancel_booking, 
          name='cancel-booking'), # URL for Deleting Bookings
+
+    path('edit-booking/<int:booking_id>/', 
+         booking_views.edit_booking, 
+         name='edit-booking'), # URL for Updating Bookings
 ]
