@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Bookings</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - Hotel Management{% endblock %}
+
+{% block content %}
     <a href="{% url 'home' %}">&larr; Back to Home</a>
 
     <h2>My Bookings</h2>
@@ -32,6 +31,4 @@
     {% else %}
         <p>You have not made any bookings yet.</p>
     {% endif %}
-
-</body>
-</html>
+{% endblock %}

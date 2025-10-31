@@ -1,32 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Welcome</title>
-</head>
-<body>
+{% extends 'base.html' %}  {% block title %}Home - Hotel Management{% endblock %}
+
+{% block content %}
     <h1>Hotel Management System</h1>
 
     {% if user.is_authenticated %}
-        <p>Hello, {{ user.first_name }}! ({{ user.email }})</p>
-
-        <p>
-            <a href="{% url 'hotel-list' %}">View All Hotels</a>
-        </p>
-
-        <p>
-            <a href="{% url 'my-bookings' %}">View My Bookings</a>
-        </p>
-
-        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" style="background:none; border:none; padding:0; color:blue; text-decoration:underline; cursor:pointer;">
-                Logout
-            </button>
-        </form>
-
+        <p>Welcome back, {{ user.first_name }}!</p>
     {% else %}
-        <p>You are not logged in.</p>
-        <p><a href="{% url 'login' %}">Login</a></p>
+        <p>Welcome! Please log in or register to book a room.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}

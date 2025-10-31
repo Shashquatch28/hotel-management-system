@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Confirm Cancellation</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Confirm Cancellation - Hotel Management{% endblock %}
+
+{% block content %}
     <h2>Confirm Cancellation</h2>
     <p>Are you sure you want to cancel your booking for Room {{ booking.room_number }} from {{ booking.checkin }} to {{ booking.checkout }}?</p>
 
@@ -12,5 +11,4 @@
         <button type="submit">Yes, Cancel</button>
         <a href="{% url 'my-bookings' %}">No, Go Back</a>
     </form>
-</body>
-</html>
+{% endblock %}

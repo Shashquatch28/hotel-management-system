@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Book Room</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Book Room - Hotel Management{% endblock %}
+
+{% block content %}
     <a href="{% url 'hotel-detail' room.hotel_id %}">&larr; Back to Hotel</a>
 
     <h2>Book Room: {{ room.room_number }} at {{ room.hotel.name }}</h2>
@@ -18,6 +17,4 @@
         
         <button type="submit">Confirm Booking</button>
     </form>
-
-</body>
-</html>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Customer, Booking
+from .models import Customer, Booking, Review
 import datetime
 
 # --- CustomerCreationForm (no changes) ---
@@ -67,3 +67,14 @@ class BookingForm(forms.ModelForm):
                     )
 
         return cleaned_data
+
+
+# Review Form
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        # Only ask the user for these two fields
+        fields = ['rating', 'comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+        }

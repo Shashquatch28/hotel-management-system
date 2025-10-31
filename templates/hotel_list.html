@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>All Hotels</title>
-</head><body>
+{% extends 'base.html' %}
 
+{% block title %}All Hotels - Hotel Management{% endblock %}
+
+{% block content %}
     <h2>Our Hotels</h2>
 
     {% if hotels %}
@@ -24,6 +23,4 @@
     {% endif %}
 
     <p><a href="{% url 'home' %}">Back to Home</a></p>
-
-</body>
-</html>
+{% endblock %}

@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ hotel.name }} Details</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
+{% block title %}{{ hotel.name }} - Hotel Management{% endblock %}
+
+{% block content %}
     <a href="{% url 'hotel-list' %}">&larr; Back to All Hotels</a>
 
     <h1>{{ hotel.name }}</h1>
@@ -14,15 +12,48 @@
 
     <hr>
 
+    <h2>Current Offers</h2>
+    {% if offers %}
+        <ul>
+            {% for offer in offers %}
+                <li>
+                    <strong>{{ offer.description }}</strong> ({{ offer.discount }}% off)
+                    <br>
+                    <small>Valid from {{ offer.start_date }} to {{ offer.end_date }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No special offers are available at this time.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Facilities</h2>
+    {% if facilities %}
+        {% else %}
+        <p>No facilities listed for this hotel.</p>
+    {% endif %}
+
+    <hr>
+
     <h2>Available Rooms</h2>
     {% if rooms %}
         <ul>
             {% for room in rooms %}
                 <li>
                     <strong>Room {{ room.room_number }} ({{ room.roomtype }})</strong>
+                    
+                    <div>
+                        {% for image in room_images %}
+                            {% if image.room_number == room.room_number %}
+                                <img src="{{ image.image_url }}" alt="{{ image.reference_name }}" width="150" style="padding:5px;">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
                     <p>Capacity: {{ room.capacity }}</p>
                     <p>Price: ${{ room.price }} per night</p>
-                    
                     <p>
                         <a href="{% url 'create-booking' room.hotel_id room.room_number %}">
                             Book Now
@@ -35,5 +66,34 @@
         <p>There are no rooms listed for this hotel.</p>
     {% endif %}
 
-</body>
-</html>
+    <hr>
+
+
+    {% if user.is_authenticated %}
+        <h3>Leave a Review</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ review_form.as_p }}
+            <button type="submit">Submit Review</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to leave a review.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Reviews</h2>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>Rating: {{ review.rating }} / 5.0</strong>
+                    <p>{{ review.comment }}</p>
+                    <small>By {{ review.cust.first_name }} on {{ review.date }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews have been submitted for this hotel.</p>
+    {% endif %}
+{% endblock %}

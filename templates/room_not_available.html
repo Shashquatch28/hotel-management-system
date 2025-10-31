@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Room Unavailable</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Room Unavailable - Hotel Management{% endblock %}
+
+{% block content %}
     <a href="{% url 'hotel-detail' room.hotel_id %}">&larr; Back to Hotel</a>
 
     <h1>Room Unavailable</h1>
     <p>We're sorry, but Room {{ room.room_number }} at {{ room.hotel.name }} is not available for booking at this time.</p>
-</body>
-</html>
+{% endblock %}

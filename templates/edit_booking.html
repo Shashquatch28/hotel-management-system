@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Booking</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Edit Booking - Hotel Management{% endblock %}
+
+{% block content %}
     <a href="{% url 'my-bookings' %}">&larr; Back to My Bookings</a>
 
     <h2>Edit Your Booking (ID: {{ booking.booking_id }})</h2>
@@ -17,6 +16,4 @@
         
         <button type="submit">Save Changes</button>
     </form>
-
-</body>
-</html>
+{% endblock %}

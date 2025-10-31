@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from .forms import CustomerCreationForm, BookingForm
-from .models import Hotel, Room, Booking, Payment
+from .forms import CustomerCreationForm, BookingForm, ReviewForm
+from .models import (
+    Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage
+)
 import datetime
 
 # Home View
@@ -25,7 +27,7 @@ def register(request):
     # Render the template with the form
     return render(request, 'register.html', {'form': form})
 
-# Hotel View
+# Hotel List View
 def hotel_list(request):
     # This is the ORM query to get all hotels
     hotels = Hotel.objects.all() 
@@ -36,26 +38,50 @@ def hotel_list(request):
     }
     return render(request, 'hotel_list.html', context)
 
-# Hotel Detail View
+# Hotel Detail View (with Review Form)
 def hotel_detail(request, hotel_id):
-    # Get the specific hotel by its ID. 
-    # get_object_or_404 is a shortcut that automatically returns a 404 error if not found.
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     
-    # Get all rooms that belong to this hotel
+    if request.method == 'POST' and request.user.is_authenticated:
+        # This part handles the review form submission
+        review_form = ReviewForm(request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.hotel = hotel
+            review.cust = request.user
+            review.date = datetime.date.today()
+            if not review.rating:
+                review.rating = 5.0 # Set a default if blank
+            review.save()
+            # Redirect back to the same page to see the new review
+            return redirect('hotel-detail', hotel_id=hotel_id)
+    else:
+        # This is for the GET request (just show a blank form)
+        review_form = ReviewForm()
+
+    
+    # Get all related objects for the hotel
     rooms = Room.objects.filter(hotel=hotel)
+    facilities = Facility.objects.filter(hotel=hotel)
+    reviews = Review.objects.filter(hotel=hotel).order_by('-date') # Show newest first
+    offers = Offer.objects.filter(hotel=hotel)
+    room_images = RoomImage.objects.filter(hotel_id=hotel_id)
     
     context = {
         'hotel': hotel,
         'rooms': rooms,
+        'facilities': facilities,
+        'reviews': reviews,
+        'offers': offers,
+        'room_images': room_images,
+        'review_form': review_form,
     }
     return render(request, 'hotel_detail.html', context)
 
-# Protected Booking View
+# "My Bookings" View
 @login_required
 def my_bookings(request):
-    # This filters the Booking table to get only the ones
-    # where 'cust' is the same as the user making the request.
+    # Get bookings only for the currently logged-in user
     bookings = Booking.objects.filter(cust=request.user)
     
     context = {
@@ -66,7 +92,6 @@ def my_bookings(request):
 # Booking Creation View
 @login_required
 def create_booking(request, hotel_id, room_number):
-    # Find the specific room the user is trying to book
     room = get_object_or_404(Room, hotel_id=hotel_id, room_number=room_number)
 
     # Check Room Availability
@@ -74,44 +99,38 @@ def create_booking(request, hotel_id, room_number):
         return render(request, 'room_not_available.html', {'room': room})
     
     if request.method == 'POST':
-        form = BookingForm(request.POST, room = room)
+        form = BookingForm(request.POST, room=room) # Pass room for validation
         if form.is_valid():
-            booking = form.save(commit=False) # Don't save to DB yet
-            booking.cust = request.user        # Set the customer
-            
-            # Set the room/hotel from the URL
+            booking = form.save(commit=False)
+            booking.cust = request.user      
             booking.hotel_id = room.hotel_id
             booking.room_number = room.room_number
-            
-            # Set other required fields
             booking.status = 'Confirmed'
             booking.bookingdate = datetime.date.today()
             
-            booking.save() # Now, save the complete object
+            booking.save() # Save booking to get an ID
             
             # Calculate Payment for Booking
             try:
-                # Calculate number of nights
                 num_nights = (booking.checkout - booking.checkin).days
                 total_price = room.price * num_nights
 
-                # Create the payment record
                 Payment.objects.create(
                     booking=booking,
                     amount=total_price,
-                    mode='Card', # You can set a default
+                    mode='Card',
                     date=datetime.date.today(),
-                    status='Pending' # Or 'Completed'
+                    status='Pending'
                 )
             except Exception as e:
                 # If payment fails, delete the booking to avoid orphans
                 booking.delete()
-
+                # In a real app, you'd show an error page
                 return redirect('home')
 
             return redirect('my-bookings') # Send to "My Bookings" page
     else:
-        form = BookingForm(room = room) # Show a blank form
+        form = BookingForm(room=room) # Pass room for validation
 
     context = {
         'form': form,
@@ -122,46 +141,45 @@ def create_booking(request, hotel_id, room_number):
 # View to Cancel Booking
 @login_required
 def cancel_booking(request, booking_id):
-    # Find the booking
     booking = get_object_or_404(Booking, pk=booking_id)
     
-    # CRITICAL: Check if the logged-in user is the owner
+    # Check if the logged-in user is the owner
     if booking.cust != request.user:
-        # If not, return a "Forbidden" error
         return HttpResponseForbidden("You are not allowed to cancel this booking.")
 
-    # We only want to delete if the form is POSTed
     if request.method == 'POST':
         booking.delete()
-        # Redirect back to the list of bookings
+        # You might also want to update the associated Payment status to 'Cancelled'
         return redirect('my-bookings')
     
-    # If it's a GET request, just show a confirmation page
+    # If it's a GET request, show a confirmation page
     context = {
         'booking': booking
     }
     return render(request, 'cancel_booking.html', context)
 
-# Edit View
+# Edit Booking View
 @login_required
 def edit_booking(request, booking_id):
-    # Find the existing booking
     booking = get_object_or_404(Booking, pk=booking_id)
+    
+    # Find the specific room for this booking
+    room = get_object_or_404(Room, hotel_id=booking.hotel_id, room_number=booking.room_number)
 
     # Check if the logged-in user is the owner
     if booking.cust != request.user:
         return HttpResponseForbidden("You are not allowed to edit this booking.")
 
     if request.method == 'POST':
-        # Load the form with the new POST data AND the existing booking instance
-        form = BookingForm(request.POST, instance=booking, room = Room)
+        # Pass the 'room' object for validation
+        form = BookingForm(request.POST, instance=booking, room=room)
         if form.is_valid():
             form.save() # Save the changes to the existing object
+            # You might want to update the Payment object here too
             return redirect('my-bookings')
     else:
-        # Load the form with the existing booking's data
-        # This is what pre-populates the fields
-        form = BookingForm(instance=booking)
+        # Pass the 'room' object for validation
+        form = BookingForm(instance=booking, room=room)
 
     context = {
         'form': form,
