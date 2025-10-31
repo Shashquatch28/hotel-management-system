@@ -70,7 +70,7 @@ def create_booking(request, hotel_id, room_number):
     room = get_object_or_404(Room, hotel_id=hotel_id, room_number=room_number)
     
     if request.method == 'POST':
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST, room = room)
         if form.is_valid():
             booking = form.save(commit=False) # Don't save to DB yet
             booking.cust = request.user        # Set the customer
@@ -87,7 +87,7 @@ def create_booking(request, hotel_id, room_number):
             
             return redirect('my-bookings') # Send to "My Bookings" page
     else:
-        form = BookingForm() # Show a blank form
+        form = BookingForm(room = room) # Show a blank form
 
     context = {
         'form': form,
@@ -130,7 +130,7 @@ def edit_booking(request, booking_id):
 
     if request.method == 'POST':
         # Load the form with the new POST data AND the existing booking instance
-        form = BookingForm(request.POST, instance=booking)
+        form = BookingForm(request.POST, instance=booking, room = Room)
         if form.is_valid():
             form.save() # Save the changes to the existing object
             return redirect('my-bookings')

@@ -10,6 +10,8 @@
     
     <form method="post">
         {% csrf_token %}
+
+        {{ form.errors.as_p }}
         
         {{ form.as_p }}
         
