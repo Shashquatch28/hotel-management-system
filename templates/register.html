@@ -1,21 +1,35 @@
-{% extends 'base.html' %}
-
-{% block title %}Register - Hotel Management{% endblock %}
+{% extends 'base_auth.html' %} {% block title %}Create an Account{% endblock %}
 
 {% block content %}
-    <h2>Create an Account</h2>
-
-    {{ form.errors.as_p }}
-
-    <form method="post">
-        {% csrf_token %}
-        
-        {{ form.as_p }}
-
-        <button type="submit">Register</button>
-    </form>
+    <div class="auth-card">
     
-    <p>
-        <a href="{% url 'login' %}">Already have an account? Login here.</a>
-    </p>
+        <div class="auth-graphic">
+            <p>Your journey begins here.</p>
+        </div>
+
+        <div class="auth-form-wrapper">
+            <div class="form-wrapper">
+                <h2>Create an Account</h2>
+
+                {% if form.errors %}
+                    <div class="form-errors">
+                        {{ form.errors.as_p }}
+                    </div>
+                {% endif %}
+            
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {{ form.as_p }}
+            
+                    <button type="submit" class="btn">Register</button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 20px;">
+                    <a href="{% url 'login' %}">Already have an account? Login here.</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

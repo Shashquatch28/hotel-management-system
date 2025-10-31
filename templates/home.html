@@ -1,11 +1,30 @@
-{% extends 'base.html' %}  {% block title %}Home - Hotel Management{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Home - Hotel Management{% endblock %}
 
 {% block content %}
-    <h1>Hotel Management System</h1>
+    
+    <div class="hero">
+        <h1>Welcome to HotelSystem</h1>
+        <p>Your premium destination for seamless booking.</p>
+        
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'hotel-list' %}" class="btn-cta">View All Hotels</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn-cta">Get Started</a>
+                <a href="{% url 'login' %}" class="btn-cta btn-cta-secondary">Login</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="container" style="text-align: center;">
+        <h2>About Our Service</h2>
+        <hr class="gold-divider"> 
+        <p>Explore top-rated hotels, manage your bookings, and leave reviews all in one place.</p>
+        {% if user.is_authenticated %}
+            <p>Use the navigation bar to manage your profile and bookings.</p>
+        {% endif %}
+    </div>
 
-    {% if user.is_authenticated %}
-        <p>Welcome back, {{ user.first_name }}!</p>
-    {% else %}
-        <p>Welcome! Please log in or register to book a room.</p>
-    {% endif %}
 {% endblock %}

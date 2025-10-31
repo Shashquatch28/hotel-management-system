@@ -50,4 +50,6 @@ urlpatterns = [
     path('edit-booking/<int:booking_id>/', 
          booking_views.edit_booking, 
          name='edit-booking'), # URL for Updating Bookings
+        
+    path('profile/', booking_views.profile, name='profile'), # URL for User Profile
 ]

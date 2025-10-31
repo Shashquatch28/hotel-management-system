@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Customer, Booking, Review
+from .models import Customer, Booking, Review, CustomerPhone
 import datetime
 
 # --- CustomerCreationForm (no changes) ---
@@ -78,3 +78,10 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 4}),
         }
+
+# CustomerPhone Form 
+class CustomerPhoneForm(forms.ModelForm):
+    class Meta:
+        model = CustomerPhone
+        # We only need the user to provide these two fields
+        fields = ['phone_number', 'is_primary']

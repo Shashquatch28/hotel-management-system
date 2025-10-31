@@ -1,37 +1,347 @@
 /* static/css/style.css */
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    line-height: 1.6;
-    background-color: #f4f4f4;
+
+/* --- 1. CSS Variables (Midnight & Gold) --- */
+:root {
+    --bg-color: #0A192F;         /* Midnight Blue */
+    --container-bg: rgba(255, 255, 255, 0.02); /* Frosted Glass */
+    
+    --text-color: #E0E0E0;      /* Warm Off-White (for body text) */
+    --heading-color: #ffffff;   /* Pure White (for headings) */
+    
+    --primary-color: #D2B48C;    /* Tan/Gold (for buttons, links) */
+    --primary-hover: #D2B48C;    /* Lighter Gold on hover */
+    
+    --border-color: rgba(210, 180, 140, 0.2); /* Faint Gold Border */
+    --error-color: #e57373;      /* Light red for dark mode */
 }
 
+/* --- 2. Base & Layout Styles --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0; /* Remove default padding */
+    background-color: var(--bg-color);
+    background-image: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), url('../images/hero-bg.jpeg'); /* Your image with a blue overlay */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* This makes it feel like a parallax effect */
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Main content container for regular pages (e.g., hotel list) */
 .container {
-    width: 80%;
-    margin: auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-color);
 }
 
 a {
-    color: #007bff;
+    color: var(--primary-color);
     text-decoration: none;
+    transition: color 0.2s ease-in-out;
 }
-
-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
 }
 
 hr {
     border: 0;
     height: 1px;
-    background: #ddd;
-    margin: 20px 0;
+    background: var(--border-color);
+    margin: 25px 0;
+}
+
+/* --- 3. Main Navigation Bar (for inner pages) --- */
+.main-nav {
+    width: 90%;
+    max-width: 960px;
+    margin: 20px auto; /* Add margin */
+    padding: 15px 25px;
+    background-color: var(--container-bg); /* Frosted glass */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.main-nav a {
+    margin-right: 20px;
+    font-weight: 500;
+}
+.main-nav .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+.main-nav .nav-right span {
+    margin-left: 15px;
+    font-size: 0.9em;
+    color: #ccc; /* Lighter text for "Hello..." */
+}
+.logout-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--primary-color);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-family: inherit;
+    font-weight: 500;
+}
+.logout-btn:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* --- 4. Auth Page Styles (Login/Register) --- */
+.auth-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+}
+.auth-card {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px;
+    background-color: var(--bg-color); /* Dark blue base */
+    border: 1px solid var(--border-color); /* Gold border */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.auth-graphic {
+    flex-basis: 50%;
+    background-color: var(--primary-color); /* Solid Gold/Tan */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--bg-color); /* Midnight Blue text */
+    font-size: 2em;
+    font-weight: bold;
+    padding: 40px;
+    text-align: center;
+}
+.auth-form-wrapper {
+    flex-basis: 50%;
+    padding: 40px;
+}
+.auth-form-wrapper .form-wrapper {
+    max-width: 100%;
+    margin: 0;
+}
+.auth-form-wrapper label,
+.auth-form-wrapper .helptext {
+    color: var(--text-color);
+}
+.auth-form-wrapper h2 {
+    color: var(--heading-color);
+}
+@media (max-width: 768px) {
+    .auth-card { flex-direction: column; }
+    .auth-graphic { display: none; }
+}
+
+/* --- 5. Form & Button Styles (Dark Mode) --- */
+.form-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+}
+.form-wrapper h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.form-wrapper p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.form-wrapper label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+.form-wrapper input[type="text"],
+.form-wrapper input[type="email"],
+.form-wrapper input[type="password"],
+.form-wrapper input[type="date"],
+.form-wrapper select,
+.form-wrapper textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    background-color: rgba(0, 0, 0, 0.2); /* Transparent black */
+    color: var(--text-color);
+}
+.form-wrapper input:focus,
+.form-wrapper textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(210, 180, 140, 0.3); /* Gold glow */
+}
+.form-wrapper .helptext {
+    font-size: 0.85em;
+    color: #ccc;
+    margin-top: 5px;
+}
+.form-wrapper .helptext ul {
+    margin: 5px 0 0 20px;
+    padding: 0;
+}
+.form-errors {
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    background-color: rgba(201, 48, 44, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.btn {
+    background-color: var(--primary-color);
+    color: var(--bg-color); /* Midnight Blue text */
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+.btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* --- 6. Card Styles (for Hotel List) --- */
+.card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: var(--container-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+/* --- 7. Hero Section (for Home Page) --- */
+.hero {
+    text-align: center;
+    /* Use a slightly different 'glass' effect */
+    background-color: transparent; 
+    padding: 60px 30px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    animation: fadeIn 2s ease-in-out;
+}
+
+.hero h1 {
+    font-size: 2.8em; /* Much larger title */
+    margin-bottom: 10px;
+    color: var(--heading-color);
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+/* --- 8. Call to Action (CTA) Button Styles --- */
+.btn-cta {
+    background-color: var(--primary-color); /* Gold/Tan */
+    color: var(--bg-color); /* Midnight Blue text */
+    padding: 14px 28px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    display: inline-block;
+    margin: 5px 10px;
+}
+.btn-cta:hover {
+    background-color: var(--primary-hover); /* Lighter Gold */
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+/* A secondary button style (e.g., for 'Register') */
+.btn-cta-secondary {
+    background-color: transparent;
+    color: var(--primary-color); /* Gold/Tan text */
+    border: 2px solid var(--primary-color);
+    /* all other styles inherited from .btn-cta */
+}
+.btn-cta-secondary:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-color); /* Text flips to blue on hover */
+}   
+
+/* --- 9. ADD THIS AT THE BOTTOM: Animations --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 10. Special Divider --- */
+.gold-divider {
+    width: 100px; /* Short, not full-width */
+    height: 2px;
+    background-color: #D4AF37; /* Your gold color */
+    border: none;
+    margin: 10px auto 20px auto; /* Center it */
+}
+
+/* --- 11. Minimalist Footer --- */
+.footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.4); /* Subtle, light text */
 }

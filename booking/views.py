@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from .forms import CustomerCreationForm, BookingForm, ReviewForm
+from .forms import CustomerCreationForm, BookingForm, ReviewForm, CustomerPhoneForm
 from .models import (
-    Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage
+    Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage, CustomerPhone
 )
 import datetime
 
@@ -186,3 +186,28 @@ def edit_booking(request, booking_id):
         'booking': booking
     }
     return render(request, 'edit_booking.html', context)
+
+
+# User Profile View
+@login_required
+def profile(request):
+    # Get all phone numbers for the current user
+    phones = CustomerPhone.objects.filter(cust=request.user)
+
+    if request.method == 'POST':
+        # User is adding a new phone number
+        form = CustomerPhoneForm(request.POST)
+        if form.is_valid():
+            phone = form.save(commit=False)
+            phone.cust = request.user  # Link the phone to the user
+            phone.save()
+            return redirect('profile') # Redirect back to the profile page
+    else:
+        # Show a blank form
+        form = CustomerPhoneForm()
+
+    context = {
+        'phones': phones,
+        'form': form
+    }
+    return render(request, 'profile.html', context)
