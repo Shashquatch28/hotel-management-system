@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 # ---------------------------------- Booking Model ----------------------------------
 class Booking(models.Model):
-    booking_id = models.IntegerField(db_column='Booking_ID', primary_key=True)  # Field name made lowercase.
+    booking_id = models.AutoField(db_column='Booking_ID', primary_key=True)  # Field name made lowercase.
     cust = models.ForeignKey('Customer', models.CASCADE, db_column='Cust_ID', blank=True, null=True)  # Field name made lowercase.
     hotel_id = models.IntegerField(db_column='Hotel_ID', blank=True, null=True)
     room_number = models.CharField(db_column='Room_Number', max_length=10, blank=True, null=True)
@@ -42,7 +42,7 @@ class CustomerManager(BaseUserManager):
 
 # ---------------------------------- Cancellation Model ----------------------------------
 class Cancellation(models.Model):
-    cancellation_id = models.IntegerField(db_column='Cancellation_ID', primary_key=True)  # Field name made lowercase.
+    cancellation_id = models.AutoField(db_column='Cancellation_ID', primary_key=True)  # Field name made lowercase.
     booking = models.ForeignKey(Booking, models.CASCADE, db_column='Booking_ID', blank=True, null=True)  # Field name made lowercase.
     cancel_date = models.DateField(db_column='Cancel_Date', blank=True, null=True)  # Field name made lowercase.
     reason = models.CharField(db_column='Reason', max_length=255, blank=True, null=True)  # Field name made lowercase.
@@ -54,7 +54,7 @@ class Cancellation(models.Model):
 
 # ---------------------------------- Customer Model ----------------------------------
 class Customer(AbstractBaseUser, PermissionsMixin): 
-    cust_id = models.IntegerField(db_column='Cust_ID', primary_key=True)
+    cust_id = models.AutoField(db_column='Cust_ID', primary_key=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
     dateofbirth = models.DateField(db_column='DateOfBirth', blank=True, null=True)
@@ -90,7 +90,7 @@ class CustomerPhone(models.Model):
 
 # ---------------------------------- Facility Model ----------------------------------
 class Facility(models.Model):
-    facility_id = models.IntegerField(db_column='Facility_ID', primary_key=True)  # Field name made lowercase.
+    facility_id = models.AutoField(db_column='Facility_ID', primary_key=True)  # Field name made lowercase.
     hotel = models.ForeignKey('Hotel', models.CASCADE, db_column='Hotel_ID', blank=True, null=True)  # Field name made lowercase.
     facility_name = models.CharField(db_column='Facility_Name', max_length=100, blank=True, null=True)  # Field name made lowercase.
 
@@ -101,7 +101,7 @@ class Facility(models.Model):
 
 # ---------------------------------- Hotel Model ----------------------------------
 class Hotel(models.Model):
-    hotel_id = models.IntegerField(db_column='Hotel_ID', primary_key=True)  # Field name made lowercase.
+    hotel_id = models.AutoField(db_column='Hotel_ID', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name', max_length=100, blank=True, null=True)  # Field name made lowercase.
     city = models.CharField(db_column='City', max_length=255, blank=True, null=True)  # Field name made lowercase.
     state = models.CharField(db_column='State', max_length=255, blank=True, null=True)  # Field name made lowercase.
@@ -116,7 +116,7 @@ class Hotel(models.Model):
 
 # ---------------------------------- Offer Model ----------------------------------
 class Offer(models.Model):
-    offer_id = models.IntegerField(db_column='Offer_ID', primary_key=True)  # Field name made lowercase.
+    offer_id = models.AutoField(db_column='Offer_ID', primary_key=True)  # Field name made lowercase.
     hotel = models.ForeignKey(Hotel, models.CASCADE, db_column='Hotel_ID', blank=True, null=True)  # Field name made lowercase.
     description = models.CharField(db_column='Description', max_length=100, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(db_column='Start_Date', blank=True, null=True)  # Field name made lowercase.
@@ -130,7 +130,7 @@ class Offer(models.Model):
 
 # ---------------------------------- Payment Model ----------------------------------
 class Payment(models.Model):
-    payment_id = models.IntegerField(db_column='Payment_ID', primary_key=True)  # Field name made lowercase.
+    payment_id = models.AutoField(db_column='Payment_ID', primary_key=True)  # Field name made lowercase.
     booking = models.ForeignKey(Booking, models.CASCADE, db_column='Booking_ID', blank=True, null=True)  # Field name made lowercase.
     amount = models.DecimalField(db_column='Amount', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     mode = models.CharField(db_column='Mode', max_length=20, blank=True, null=True)  # Field name made lowercase.
@@ -144,7 +144,7 @@ class Payment(models.Model):
 
 # ---------------------------------- Review Model ----------------------------------
 class Review(models.Model):
-    review_id = models.IntegerField(db_column='Review_ID', primary_key=True)  # Field name made lowercase.
+    review_id = models.AutoField(db_column='Review_ID', primary_key=True)  # Field name made lowercase.
     cust = models.ForeignKey(Customer, models.CASCADE, db_column='Cust_ID', blank=True, null=True)  # Field name made lowercase.
     hotel = models.ForeignKey(Hotel, models.CASCADE, db_column='Hotel_ID', blank=True, null=True)  # Field name made lowercase.
     rating = models.DecimalField(db_column='Rating', max_digits=2, decimal_places=1, blank=True, null=True)  # Field name made lowercase.

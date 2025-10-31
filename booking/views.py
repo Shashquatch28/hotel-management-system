@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .forms import CustomerCreationForm, BookingForm
-from .models import Hotel, Room, Booking
+from .models import Hotel, Room, Booking, Payment
 import datetime
 
 # Home View
@@ -68,6 +68,10 @@ def my_bookings(request):
 def create_booking(request, hotel_id, room_number):
     # Find the specific room the user is trying to book
     room = get_object_or_404(Room, hotel_id=hotel_id, room_number=room_number)
+
+    # Check Room Availability
+    if not room.availability:
+        return render(request, 'room_not_available.html', {'room': room})
     
     if request.method == 'POST':
         form = BookingForm(request.POST, room = room)
@@ -85,6 +89,26 @@ def create_booking(request, hotel_id, room_number):
             
             booking.save() # Now, save the complete object
             
+            # Calculate Payment for Booking
+            try:
+                # Calculate number of nights
+                num_nights = (booking.checkout - booking.checkin).days
+                total_price = room.price * num_nights
+
+                # Create the payment record
+                Payment.objects.create(
+                    booking=booking,
+                    amount=total_price,
+                    mode='Card', # You can set a default
+                    date=datetime.date.today(),
+                    status='Pending' # Or 'Completed'
+                )
+            except Exception as e:
+                # If payment fails, delete the booking to avoid orphans
+                booking.delete()
+
+                return redirect('home')
+
             return redirect('my-bookings') # Send to "My Bookings" page
     else:
         form = BookingForm(room = room) # Show a blank form
