@@ -1,34 +1,50 @@
 {% extends 'base.html' %}
 
-{% block title %}My Bookings - Hotel Management{% endblock %}
+{% block title %}My Bookings{% endblock %}
 
 {% block content %}
-    <a href="{% url 'home' %}">&larr; Back to Home</a>
+    
+    <div class="content-wrapper-narrow">
+    
+        <h2 style="text-align: center;">My Bookings</h2>
+        
+        {% if bookings %}
+            <ul class="card-list">
+                {% for booking in bookings %}
+                    <li class="card" style="background-color: rgba(210, 180, 140, 0.9);"> 
+                        
+                        <div class="card-content">
+                            <h3 style="margin-bottom: 5px;">
+                                Booking ID: {{ booking.booking_id }}
+                            </h3>
+                            
+                            <p>Status: <span class="status-confirmed">{{ booking.status }}</span></p>
 
-    <h2>My Bookings</h2>
-
-    {% if bookings %}
-        <ul>
-            {% for booking in bookings %}
-                <li>
-                    <strong>Booking ID: {{ booking.booking_id }}</strong>
-                    <p>Hotel ID: {{ booking.hotel_id }} | Room: {{ booking.room_number }}</p>
-                    <p>Check-in: {{ booking.checkin }}</p>
-                    <p>Check-out: {{ booking.checkout }}</p>
-                    <p>Status: {{ booking.status }}</p>
-                    <p>
-                        <a href="{% url 'edit-booking' booking.booking_id %}">
-                            Edit
-                        </a>
-                        <a href="{% url 'cancel-booking' booking.booking_id %}">
-                            Cancel this booking
-                        </a>
-                    </p>
-                </li>
-                <hr>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>You have not made any bookings yet.</p>
-    {% endif %}
-{% endblock %}
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 0.9em; margin-bottom: 15px; color: var(--bg-color);">
+                                <div>
+                                    <strong>Hotel ID:</strong> {{ booking.hotel_id }}<br>
+                                    <strong>Room:</strong> {{ booking.room_number }}
+                                </div>
+                                <div>
+                                    <strong>Check-in:</strong> {{ booking.checkin }}<br>
+                                    <strong>Check-out:</strong> {{ booking.checkout }}
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: right;">
+                                <a href="{% url 'edit-booking' booking.booking_id %}" class="btn-edit">
+                                    Edit
+                                </a> 
+                                <a href="{% url 'cancel-booking' booking.booking_id %}" class="btn-cancel">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="text-align: center;">You have not made any bookings yet.</p>
+        {% endif %}
+    
+    </div> {% endblock %}

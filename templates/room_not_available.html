@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Room Unavailable - Hotel Management{% endblock %}
+{% block title %}Room Unavailable{% endblock %}
 
 {% block content %}
-    <a href="{% url 'hotel-detail' room.hotel_id %}">&larr; Back to Hotel</a>
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'hotel-detail' room.hotel_id %}">&larr; Back to Hotel</a>
+    </div>
 
-    <h1>Room Unavailable</h1>
-    <p>We're sorry, but Room {{ room.room_number }} at {{ room.hotel.name }} is not available for booking at this time.</p>
+    <div class="form-wrapper" style="text-align: center;">
+        <h2 style="color: var(--error-color);">Room Unavailable</h2>
+        <p>We're sorry, but Room **{{ room.room_number }}** at **{{ room.hotel.name }}** is not available for booking at this time.</p>
+        <p>This room is either already booked or temporarily closed.</p>
+    </div>
 {% endblock %}

@@ -3,32 +3,47 @@
 {% block title %}My Profile{% endblock %}
 
 {% block content %}
-    <h2>My Profile</h2>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+    
+    <div class="content-wrapper-narrow">
 
-    <hr>
+        <h2 style="text-align: center; margin-bottom: 30px;">My Profile</h2>
 
-    <h3>My Phone Numbers</h3>
-    {% if phones %}
-        <ul>
-            {% for phone in phones %}
-                <li>
-                    {{ phone.phone_number }}
-                    {% if phone.is_primary %}(Primary){% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>You have not added any phone numbers.</p>
-    {% endif %}
+        <div class="profile-info">
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        </div>
 
-    <hr>
+        <div class="profile-info">
+            <h3>My Phone Numbers</h3>
+            {% if phones %}
+                <ul>
+                    {% for phone in phones %}
+                        <li>
+                            {{ phone.phone_number }} 
+                            {% if phone.is_primary %}<span style="color: var(--primary-color);">(Primary)</span>{% endif %}
+                            
+                            <form action="{% url 'delete-phone' phone.pk %}" method="post" style="display: inline; margin-left: 15px;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-cancel" style="padding: 0 5px; font-size: 0.9em; border: none; background: none;">
+                                    (Delete)
+                                </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have not added any phone numbers.</p>
+            {% endif %}
+        </div>
 
-    <h3>Add a New Phone Number</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Phone</button>
-    </form>
+        <div class="form-wrapper" style="margin-top: 40px; padding: 25px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <h3>Add a New Phone Number</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn">Add Phone</button>
+            </form>
+        </div>
+        
+    </div>
 {% endblock %}

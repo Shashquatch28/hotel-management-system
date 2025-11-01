@@ -1,26 +1,44 @@
 {% extends 'base.html' %}
 
-{% block title %}All Hotels - Hotel Management{% endblock %}
+{% block title %}All Hotels{% endblock %}
 
 {% block content %}
     <h2>Our Hotels</h2>
 
     {% if hotels %}
-        <ul>
+        <ul class="card-list">
             {% for hotel in hotels %}
-                <li>
-                    <strong>
-                        <a href="{% url 'hotel-detail' hotel.hotel_id %}">
-                            {{ hotel.name }}
+                <li class="card">
+                
+                    {% if hotel.images %}
+                        <div class="card-slider">
+                            {% for image in hotel.images %}
+                                <img src="{{ image.image_url }}" alt="{{ image.reference_name }}">
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="image-placeholder">
+                            <p>No preview available</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-content">
+                        <h3>
+                            <a href="{% url 'hotel-detail' hotel.hotel_id %}">
+                                {{ hotel.name }}
+                            </a>
+                        </h3>
+                        <p>{{ hotel.city }}, {{ hotel.state }}</p>
+                        <p>Rating: {{ hotel.rating }} / 5.0</p>
+                        <a href="{% url 'hotel-detail' hotel.hotel_id %}" class="btn-card">
+                            View Hotel
                         </a>
-                    </strong> - {{ hotel.city }}, {{ hotel.state }}
-                    <p>Rating: {{ hotel.rating }}</p>
+                    </div>
+                    
                 </li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No hotels are available at this time.</p>
     {% endif %}
-
-    <p><a href="{% url 'home' %}">Back to Home</a></p>
 {% endblock %}

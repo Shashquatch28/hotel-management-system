@@ -193,6 +193,7 @@ hr {
     font-size: 1em;
     background-color: rgba(0, 0, 0, 0.2); /* Transparent black */
     color: var(--text-color);
+    position: relative;
 }
 .form-wrapper input:focus,
 .form-wrapper textarea:focus {
@@ -234,7 +235,7 @@ hr {
     transform: translateY(-2px);
 }
 
-/* --- 6. Card Styles (for Hotel List) --- */
+/* --- 6. Card Styles (MODIFIED) --- */
 .card-list {
     list-style: none;
     padding: 0;
@@ -243,20 +244,108 @@ hr {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 }
+
 .card {
-    background: var(--container-bg);
+    background: var(--primary-color); 
+    color: var(--bg-color); 
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 20px;
+    /* We'll let the content define the height, no min-height */
+    display: flex;       
+    flex-direction: column; 
     transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    /* Remove padding from the card itself */
+    padding: 0; 
+    overflow: hidden; /* This is key for the rounded corners */
 }
+
 .card:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
-.card h3 {
+
+/* This container holds the text content below the slider */
+.card-content {
+    padding: 20px; /* Add padding here instead of on the card */
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column; /* Stack content */
+}
+
+.card-content h3 {
     margin-top: 0;
-    color: var(--primary-color);
+    color: var(--bg-color);
+}
+
+.card-content p {
+    font-size: 0.9em;
+    opacity: 0.8; /* Make secondary text slightly faded */
+    flex-grow: 1; /* Pushes the button to the bottom */
+}
+
+/* Make sure links in the text are dark */
+.card-content a {
+    color: var(--bg-color);
+}
+.card-content a:hover {
+    color: var(--bg-color);
+    text-decoration: underline;
+}
+
+/* --- Card Slider & Placeholder --- */
+.card-slider {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;  
+    border-radius: 5px; /* Keep outer border radius */
+    margin-bottom: 15px;
+    scroll-snap-type: x mandatory;
+
+    /* --- Custom Scrollbar Styles (for WebKit browsers) --- */
+    /* Make scrollbar track transparent */
+    &::-webkit-scrollbar {
+        height: 6px; /* Height of the horizontal scrollbar */
+        background-color: transparent;
+    }
+
+    /* Style the thumb */
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2); /* Light, transparent gold/white */
+        border-radius: 3px;
+    }
+
+    /* Style the thumb on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.4); /* Slightly more visible on hover */
+    }
+
+    /* Hide the track completely for a cleaner look */
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+}
+
+.card-slider img {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover; 
+    scroll-snap-align: start;
+    /* Ensure images fill the slider without extra space */
+    flex-shrink: 0; 
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.1); 
+    color: var(--bg-color); 
+    font-style: italic;
+    font-size: 0.9em;
 }
 
 /* --- 7. Hero Section (for Home Page) --- */
@@ -344,4 +433,250 @@ hr {
     margin-top: 30px;
     font-size: 0.9em;
     color: rgba(255, 255, 255, 0.4); /* Subtle, light text */
+}
+
+/* --- 12. Image Placeholder --- */
+.image-placeholder {
+    width: 100%;
+    height: 200px; /* Same height as the slider */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.1); /* Dark, subtle background */
+    border-radius: 5px;
+    margin-bottom: 15px;
+    color: var(--bg-color); /* Midnight Blue text */
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* --- 13. Card Button --- */
+.btn-card {
+    display: inline-block;
+    background-color: var(--bg-color); /* Midnight Blue background */
+    
+    /* THIS IS THE FIX: 
+      We explicitly set the text color to Gold.
+      It was inheriting the dark link color before.
+    */
+    color: var(--primary-color) !important;       
+
+    padding: 10px 15px;
+    border: 1px solid var(--bg-color);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 15px; /* More space */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-card:hover {
+    background-color: var(--primary-hover);
+    color: var(--bg-color) !important; /* Inverted on hover */
+    text-decoration: none;
+    border-color: var(--primary-hover);
+}
+
+/* --- 13. Page Content Wrappers --- */
+.content-wrapper-narrow {
+    max-width: 700px; /* Set a comfortable max width */
+    margin: 0 auto;   /* Center it */
+}
+
+/* --- 14. Hotel Detail Grid Layout --- */
+.hotel-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Main content 2x width of sidebar */
+    gap: 40px; /* Space between columns */
+    max-width: 1200px; /* Max width for the entire grid */
+    margin: 0 auto; /* Center the grid */
+    padding: 20px 0; /* Vertical padding */
+
+    /* Responsive adjustment for smaller screens */
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr; /* Single column on small screens */
+        gap: 20px;
+    }
+}
+
+.main-content-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; 
+}
+
+.sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; 
+}
+
+
+.section-content {
+    padding: 25px; /* Unified padding */
+    background: var(--container-bg); /* Frosted glass background */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    flex-grow: 1; 
+}
+
+.section-content h2 {
+    margin-top: 0;
+    padding-bottom: 15px;
+    color: var(--primary-color); /* Gold */
+    font-size: 1.5em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color); /* Gold line */
+    margin-bottom: 20px;
+}   
+
+.hotel-detail-header {
+    text-align: center; 
+    margin-bottom: 40px; 
+    max-width: 900px; 
+    margin-left: auto;
+    margin-right: auto;
+}
+.hotel-detail-header h1 {
+    font-size: 3em; 
+}
+
+/* Small adjustment for the form in the sidebar */
+.sidebar-column .review-form {
+    margin-top: 0; /* Remove extra margin from review form */
+}
+
+/* Make sure the review form inputs look good */
+.review-form p {
+    margin-bottom: 15px; /* Space between form fields */
+}
+.review-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+.review-form input[type="text"],
+.review-form input[type="number"],
+.review-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.05); /* Very subtle input background */
+    color: var(--text-color);
+    box-sizing: border-box; /* Include padding in width */
+}
+.review-form input[type="text"]:focus,
+.review-form input[type="number"]:focus,
+.review-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.3);
+}
+.review-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Adjust list item spacing in .info-list */
+.info-list li {
+    padding: 15px; /* More padding for list items */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.info-list li strong {
+    color: var(--primary-color); /* Highlight strong text */
+}
+
+/* Remove the default hr, as we'll use a gold-divider class now */
+hr:not(.gold-divider) {
+    display: none;
+}
+
+/* --- 15. Date Picker Fix --- */
+.form-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    color: transparent; /* Makes the original icon invisible */
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Optional: Style the internal calendar button (WebKit only) */
+.form-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+    color: var(--primary-color); /* Makes the calendar icon gold */
+    opacity: 1; /* Ensures it is not transparent */
+    display: block; /* Ensures it is always rendered */
+    cursor: pointer;
+}
+
+/* --- 16. Booking Status and Action Links --- */
+.status-confirmed {
+    /* Use the dark Midnight Blue for maximum contrast */
+    color: var(--bg-color); 
+    font-weight: 600;
+}
+.status-pending {
+    /* Use the dark Midnight Blue for maximum contrast */
+    color: var(--bg-color); 
+    font-weight: 600;
+}
+.btn-edit {
+    background-color: var(--bg-color); 
+    color: var(--primary-color) !important;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+.btn-edit:hover {
+    background-color: var(--primary-hover);
+}
+.btn-cancel {
+    /* Use dark red/error color for visibility */
+    color: var(--bg-color); 
+    font-weight: 500;
+    margin-left: 10px;
+    font-size: 0.9em;
+    text-decoration: underline; /* Added underline for clarity */
+}
+.btn-cancel:hover {
+    color: var(--error-color); /* Highlight red on hover */
+}
+
+/* --- 17. My Profile Specific Styles --- */
+.profile-info {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color); /* Subtle divider */
+}
+
+.profile-info h3 {
+    color: var(--primary-color);
+    font-size: 1.3em;
+    margin-top: 0;
+}
+
+.profile-info ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+.profile-info li {
+    padding: 8px 0;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.1em;
 }

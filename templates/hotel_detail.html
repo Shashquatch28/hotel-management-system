@@ -1,99 +1,119 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ hotel.name }} - Hotel Management{% endblock %}
+{% block title %}{{ hotel.name }} Details{% endblock %}
 
 {% block content %}
-    <a href="{% url 'hotel-list' %}">&larr; Back to All Hotels</a>
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'hotel-list' %}">&larr; Back to All Hotels</a>
+    </div>
 
-    <h1>{{ hotel.name }}</h1>
-    <p><strong>City:</strong> {{ hotel.city }}, {{ hotel.state }}</p>
-    <p><strong>Rating:</strong> {{ hotel.rating }} / 5.0</p>
-    <p><strong>Description:</strong> {{ hotel.description }}</p>
+    <div class="hotel-detail-header">
+        <h1>{{ hotel.name }}</h1>
+        <p>{{ hotel.city }}, {{ hotel.state }} | Rating: {{ hotel.rating }} / 5.0</p>
+        <p>{{ hotel.description }}</p>
+    </div>
 
-    <hr>
+    <hr class="gold-divider" style="margin-top: 25px; margin-bottom: 40px;">
 
-    <h2>Current Offers</h2>
-    {% if offers %}
-        <ul>
-            {% for offer in offers %}
-                <li>
-                    <strong>{{ offer.description }}</strong> ({{ offer.discount }}% off)
-                    <br>
-                    <small>Valid from {{ offer.start_date }} to {{ offer.end_date }}</small>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No special offers are available at this time.</p>
-    {% endif %}
-
-    <hr>
-
-    <h2>Facilities</h2>
-    {% if facilities %}
-        {% else %}
-        <p>No facilities listed for this hotel.</p>
-    {% endif %}
-
-    <hr>
-
-    <h2>Available Rooms</h2>
-    {% if rooms %}
-        <ul>
-            {% for room in rooms %}
-                <li>
-                    <strong>Room {{ room.room_number }} ({{ room.roomtype }})</strong>
-                    
-                    <div>
-                        {% for image in room_images %}
-                            {% if image.room_number == room.room_number %}
-                                <img src="{{ image.image_url }}" alt="{{ image.reference_name }}" width="150" style="padding:5px;">
-                            {% endif %}
+    <div class="hotel-detail-grid">
+        <div class="main-content-column">
+            
+            <section class="section-content">
+                <h2>Current Offers</h2>
+                {% if offers %}
+                    <ul class="info-list">
+                        {% for offer in offers %}
+                            <li>
+                                <strong>{{ offer.description }}</strong> ({{ offer.discount }}% off)
+                                <br>
+                                <small>Valid from {{ offer.start_date }} to {{ offer.end_date }}</small>
+                            </li>
                         {% endfor %}
-                    </div>
+                    </ul>
+                {% else %}
+                    <p>No special offers are available at this time.</p>
+                {% endif %}
+            </section>
 
-                    <p>Capacity: {{ room.capacity }}</p>
-                    <p>Price: ${{ room.price }} per night</p>
-                    <p>
-                        <a href="{% url 'create-booking' room.hotel_id room.room_number %}">
-                            Book Now
-                        </a>
-                    </p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no rooms listed for this hotel.</p>
-    {% endif %}
+            <section class="section-content">
+                <h2>Facilities</h2>
+                {% if facilities %}
+                    <ul class="info-list">
+                        {% for facility in facilities %}
+                            <li>{{ facility.facility_name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No facilities listed for this hotel.</p>
+                {% endif %}
+            </section>
 
-    <hr>
+            <section class="section-content">
+                <h2>Available Rooms</h2>
+                {% if rooms %}
+                    <ul class="room-list card-list">
+                        {% for room in rooms %}
+                            <li class="card">
+                                {% if room.images %}
+                                    <div class="card-slider">
+                                        {% for image in room.images %}
+                                            <img src="{{ image.image_url }}" alt="{{ image.reference_name }}">
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="image-placeholder">
+                                        <p>No preview available</p>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="card-content">
+                                    <h3>Room {{ room.room_number }} ({{ room.roomtype }})</h3>
+                                    <p>Capacity: {{ room.capacity }}</p>
+                                    <p>Price: ${{ room.price }} per night</p>
+                                    <a href="{% url 'create-booking' room.hotel_id room.room_number %}" class="btn-card">
+                                        Book Now
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>There are no rooms listed for this hotel.</p>
+                {% endif %}
+            </section>
+        </div>
 
+        <div class="sidebar-column">
+            
+            <section class="section-content review-form">
+                <h2>Leave a Review</h2>
+                {% if user.is_authenticated %}
+                    <form method="post" class="form-wrapper" style="max-width: 100%;">
+                        {% csrf_token %}
+                        {{ review_form.as_p }}
+                        <button type="submit" class="btn">Submit Review</button>
+                    </form>
+                {% else %}
+                    <p style="text-align: center;"><a href="{% url 'login' %}">Log in</a> to leave a review.</p>
+                {% endif %}
+            </section>
 
-    {% if user.is_authenticated %}
-        <h3>Leave a Review</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ review_form.as_p }}
-            <button type="submit">Submit Review</button>
-        </form>
-    {% else %}
-        <p><a href="{% url 'login' %}">Log in</a> to leave a review.</p>
-    {% endif %}
-
-    <hr>
-
-    <h2>Reviews</h2>
-    {% if reviews %}
-        <ul>
-            {% for review in reviews %}
-                <li>
-                    <strong>Rating: {{ review.rating }} / 5.0</strong>
-                    <p>{{ review.comment }}</p>
-                    <small>By {{ review.cust.first_name }} on {{ review.date }}</small>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No reviews have been submitted for this hotel.</p>
-    {% endif %}
+            <section class="section-content">
+                <h2>Customer Reviews</h2>
+                {% if reviews %}
+                    <ul class="info-list">
+                        {% for review in reviews %}
+                            <li>
+                                <strong>Rating: {{ review.rating }} / 5.0</strong>
+                                <p>"{{ review.comment }}"</p>
+                                <small>By {{ review.cust.first_name }} on {{ review.date }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No reviews have been submitted for this hotel.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
 {% endblock %}

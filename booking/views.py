@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
@@ -6,6 +7,7 @@ from .models import (
     Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage, CustomerPhone
 )
 import datetime
+
 
 # Home View
 def home(request):
@@ -29,12 +31,21 @@ def register(request):
 
 # Hotel List View
 def hotel_list(request):
-    # This is the ORM query to get all hotels
     hotels = Hotel.objects.all() 
     
-    # Pass the list of hotels to the template
+    # 1. Get all room images and group them by hotel_id
+    all_room_images_query = RoomImage.objects.all()
+    all_room_images = defaultdict(list)
+    for image in all_room_images_query:
+        # This groups images by the hotel's ID
+        all_room_images[image.hotel_id].append(image)
+
+    # 2. Attach the list of images to each hotel object
+    for hotel in hotels:
+        hotel.images = all_room_images.get(hotel.hotel_id, []) # Get the list (or an empty list)
+
     context = {
-        'hotels': hotels
+        'hotels': hotels, # Pass the modified hotel objects
     }
     return render(request, 'hotel_list.html', context)
 
@@ -43,7 +54,6 @@ def hotel_detail(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     
     if request.method == 'POST' and request.user.is_authenticated:
-        # This part handles the review form submission
         review_form = ReviewForm(request.POST)
         if review_form.is_valid():
             review = review_form.save(commit=False)
@@ -51,30 +61,37 @@ def hotel_detail(request, hotel_id):
             review.cust = request.user
             review.date = datetime.date.today()
             if not review.rating:
-                review.rating = 5.0 # Set a default if blank
+                review.rating = 5.0 
             review.save()
-            # Redirect back to the same page to see the new review
             return redirect('hotel-detail', hotel_id=hotel_id)
     else:
-        # This is for the GET request (just show a blank form)
         review_form = ReviewForm()
 
     
-    # Get all related objects for the hotel
+    # --- THIS IS THE UPDATED LOGIC ---
     rooms = Room.objects.filter(hotel=hotel)
     facilities = Facility.objects.filter(hotel=hotel)
-    reviews = Review.objects.filter(hotel=hotel).order_by('-date') # Show newest first
+    reviews = Review.objects.filter(hotel=hotel).order_by('-date')
     offers = Offer.objects.filter(hotel=hotel)
-    room_images = RoomImage.objects.filter(hotel_id=hotel_id)
     
+    # 1. Get images and group them by room_number
+    room_images_query = RoomImage.objects.filter(hotel_id=hotel_id)
+    room_images_dict = defaultdict(list)
+    for image in room_images_query:
+        room_images_dict[image.room_number].append(image)
+
+    # 2. THIS IS THE NEW PART: Attach images to each room object
+    for room in rooms:
+        room.images = room_images_dict.get(room.room_number, [])
+
     context = {
         'hotel': hotel,
-        'rooms': rooms,
+        'rooms': rooms, # Rooms now have .images attached
         'facilities': facilities,
         'reviews': reviews,
         'offers': offers,
-        'room_images': room_images,
         'review_form': review_form,
+        # We no longer need to pass room_images
     }
     return render(request, 'hotel_detail.html', context)
 
@@ -211,3 +228,25 @@ def profile(request):
         'form': form
     }
     return render(request, 'profile.html', context)
+
+# View to Delete Phone
+@login_required
+def delete_phone(request, phone_id):
+    # Find the phone number
+    phone = get_object_or_404(CustomerPhone, pk=phone_id)
+
+    # CRITICAL: Check if the logged-in user is the owner
+    if phone.cust != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this phone number.")
+
+    # We only want to delete if the form is POSTed
+    if request.method == 'POST':
+        phone.delete()
+        # Redirect back to the profile page
+        return redirect('profile')
+    
+    # If it's a GET request, just show a confirmation page
+    context = {
+        'phone': phone
+    }
+    return render(request, 'delete_phone.html', context)
