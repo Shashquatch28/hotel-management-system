@@ -12,7 +12,7 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'hotel-list' %}" class="btn-cta">View All Hotels</a>
             {% else %}
-                <a href="{% url 'register' %}" class="btn-cta">Get Started</a>
+                <a href="{% url 'register' %}" class="btn-cta">Register</a>
                 <a href="{% url 'login' %}" class="btn-cta btn-cta-secondary">Login</a>
             {% endif %}
         </div>

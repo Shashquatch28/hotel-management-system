@@ -70,10 +70,24 @@ class BookingForm(forms.ModelForm):
 
 
 # Review Form
+RATING_CHOICES = [
+    (5, '5 Stars - Excellent'),
+    (4, '4 Stars - Good'),
+    (3, '3 Stars - Average'),
+    (2, '2 Stars - Poor'),
+    (1, '1 Star - Terrible'),
+]
 class ReviewForm(forms.ModelForm):
+    # 1. Override the 'rating' field to use our choices
+    rating = forms.ChoiceField(
+        choices=RATING_CHOICES,
+        widget=forms.Select(), # This creates the <select> dropdown
+        label="Rating"
+    )
+
     class Meta:
         model = Review
-        # Only ask the user for these two fields
+        # 2. Make sure 'rating' and 'comment' are listed
         fields = ['rating', 'comment']
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 4}),
@@ -85,3 +99,16 @@ class CustomerPhoneForm(forms.ModelForm):
         model = CustomerPhone
         # We only need the user to provide these two fields
         fields = ['phone_number', 'is_primary']
+
+
+# Customer Update Form
+class CustomerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        # These are the fields the user will be able to edit
+        fields = ['first_name', 'last_name', 'dateofbirth', 'city', 'state', 'country']
+        
+        # Use the date picker for Date of Birth
+        widgets = {
+            'dateofbirth': DateInput(),
+        }

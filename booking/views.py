@@ -1,8 +1,13 @@
 from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import HttpResponseForbidden
-from .forms import CustomerCreationForm, BookingForm, ReviewForm, CustomerPhoneForm
+from django.db.models import Q
+from .forms import (
+    CustomerCreationForm, BookingForm, ReviewForm, CustomerPhoneForm, 
+    CustomerUpdateForm
+)
 from .models import (
     Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage, CustomerPhone
 )
@@ -21,6 +26,7 @@ def register(request):
         if form.is_valid():
             form.save() # This creates and saves the new user
             # Redirect to the login page after successful registration
+            messages.success(request, 'Your account has been created! You can now log in.')
             return redirect('login') 
     else:
         # User is just visiting the page
@@ -31,21 +37,35 @@ def register(request):
 
 # Hotel List View
 def hotel_list(request):
-    hotels = Hotel.objects.all() 
     
-    # 1. Get all room images and group them by hotel_id
+    # 1. Get the search query from the URL (e.g., ?q=Pune)
+    query = request.GET.get('q', '') # Get 'q', or an empty string if it's not there
+    
+    # 2. Start with all hotels, then filter if a query exists
+    if query:
+        hotels = Hotel.objects.filter(
+            Q(name__icontains=query) |
+            Q(city__icontains=query) |
+            Q(state__icontains=query)
+        ).distinct() # .distinct() prevents duplicates
+    else:
+        # If no query, just get all hotels
+        hotels = Hotel.objects.all() 
+    
+    # 3. Get all room images and group them by hotel_id
     all_room_images_query = RoomImage.objects.all()
     all_room_images = defaultdict(list)
     for image in all_room_images_query:
         # This groups images by the hotel's ID
         all_room_images[image.hotel_id].append(image)
 
-    # 2. Attach the list of images to each hotel object
+    # 4. Attach the list of images to each hotel object
     for hotel in hotels:
         hotel.images = all_room_images.get(hotel.hotel_id, []) # Get the list (or an empty list)
 
     context = {
         'hotels': hotels, # Pass the modified hotel objects
+        'search_query': query, # 5. Pass the query back to the template
     }
     return render(request, 'hotel_list.html', context)
 
@@ -60,9 +80,8 @@ def hotel_detail(request, hotel_id):
             review.hotel = hotel
             review.cust = request.user
             review.date = datetime.date.today()
-            if not review.rating:
-                review.rating = 5.0 
             review.save()
+            messages.success(request, 'Your review has been submitted. Thank you!')
             return redirect('hotel-detail', hotel_id=hotel_id)
     else:
         review_form = ReviewForm()
@@ -142,9 +161,12 @@ def create_booking(request, hotel_id, room_number):
             except Exception as e:
                 # If payment fails, delete the booking to avoid orphans
                 booking.delete()
-                # In a real app, you'd show an error page
-                return redirect('home')
+                
+                messages.error(request, 'There was an error processing your payment. Please try again.')
+                # Redirect back to the same form
+                return redirect('create-booking', hotel_id=hotel_id, room_number=room_number)
 
+            messages.success(request, 'Your booking has been confirmed!')
             return redirect('my-bookings') # Send to "My Bookings" page
     else:
         form = BookingForm(room=room) # Pass room for validation
@@ -165,8 +187,20 @@ def cancel_booking(request, booking_id):
         return HttpResponseForbidden("You are not allowed to cancel this booking.")
 
     if request.method == 'POST':
-        booking.delete()
+
+        try:
+            # Find the related payment
+            payment = Payment.objects.get(booking=booking)
+            payment.status = 'Cancelled'
+            payment.save()
+        except Payment.DoesNotExist:
+            # No payment was found, which is fine.
+            pass
+
+        booking.status = 'Cancelled'
+        booking.save()
         # You might also want to update the associated Payment status to 'Cancelled'
+        messages.success(request, 'Your booking has been successfully cancelled.')
         return redirect('my-bookings')
     
     # If it's a GET request, show a confirmation page
@@ -179,23 +213,36 @@ def cancel_booking(request, booking_id):
 @login_required
 def edit_booking(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
-    
-    # Find the specific room for this booking
     room = get_object_or_404(Room, hotel_id=booking.hotel_id, room_number=booking.room_number)
 
-    # Check if the logged-in user is the owner
     if booking.cust != request.user:
         return HttpResponseForbidden("You are not allowed to edit this booking.")
 
     if request.method == 'POST':
-        # Pass the 'room' object for validation
         form = BookingForm(request.POST, instance=booking, room=room)
         if form.is_valid():
-            form.save() # Save the changes to the existing object
-            # You might want to update the Payment object here too
+            # Save the updated booking
+            updated_booking = form.save() 
+            
+            try:
+                # Find the related payment
+                payment = Payment.objects.get(booking=updated_booking)
+                
+                # Recalculate the price
+                num_nights = (updated_booking.checkout - updated_booking.checkin).days
+                total_price = room.price * num_nights
+                
+                # Update the payment
+                payment.amount = total_price
+                payment.save()
+                
+            except Payment.DoesNotExist:
+                # If no payment exists, you could create one
+                pass
+
+            messages.success(request, 'Your booking has been successfully updated.')
             return redirect('my-bookings')
     else:
-        # Pass the 'room' object for validation
         form = BookingForm(instance=booking, room=room)
 
     context = {
@@ -218,6 +265,7 @@ def profile(request):
             phone = form.save(commit=False)
             phone.cust = request.user  # Link the phone to the user
             phone.save()
+            messages.success(request, 'Phone number added successfully.')
             return redirect('profile') # Redirect back to the profile page
     else:
         # Show a blank form
@@ -229,9 +277,28 @@ def profile(request):
     }
     return render(request, 'profile.html', context)
 
+# --- 2. ADD THIS NEW VIEW ---
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        # Load the form with POST data and the current user's instance
+        form = CustomerUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile') # Redirect to profile page on success
+    else:
+        # Load the form with the current user's existing data
+        form = CustomerUpdateForm(instance=request.user)
+    
+    context = {
+        'form': form
+    }
+    return render(request, 'edit_profile.html', context)
+
 # View to Delete Phone
 @login_required
-def delete_phone(request, cust_id, phone_number): # <--- Accepts two arguments
+def delete_phone(request, cust_id, phone_number): # Accepts two arguments
     # 1. Use both fields to find the unique phone number
     phone = get_object_or_404(
         CustomerPhone, 
@@ -246,6 +313,7 @@ def delete_phone(request, cust_id, phone_number): # <--- Accepts two arguments
     # We only want to delete if the form is POSTed
     if request.method == 'POST':
         phone.delete()
+        messages.success(request, 'Phone number deleted.')
         return redirect('profile')
     
     # If it's a GET request, show confirmation

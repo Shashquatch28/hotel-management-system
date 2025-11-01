@@ -1,14 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}Confirm Cancellation - Hotel Management{% endblock %}
+{% block title %}Confirm Cancellation{% endblock %}
 
 {% block content %}
-    <h2>Confirm Cancellation</h2>
-    <p>Are you sure you want to cancel your booking for Room {{ booking.room_number }} from {{ booking.checkin }} to {{ booking.checkout }}?</p>
+    
+    <div class="content-wrapper-narrow">
+        
+        <div class="section-content review-form" style="text-align: center; background: var(--primary-color); color: var(--bg-color);">
+            
+            <h2 style="color: var(--bg-color);">Confirm Cancellation</h2>
+            
+            <p>Are you sure you want to cancel your booking for Room {{ booking.room_number }} from {{ booking.checkin }} to {{ booking.checkout }}?</p>
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes, Cancel</button>
-        <a href="{% url 'my-bookings' %}">No, Go Back</a>
-    </form>
+            <form method="post" style="margin-top: 20px;">
+                {% csrf_token %}
+                
+                <button type="submit" class="btn-danger-small" style="padding: 10px 20px; font-size: 1em;">
+                    Yes, Cancel
+                </button>
+                
+                <a href="{% url 'my-bookings' %}" style="margin-left: 15px; color: var(--bg-color); text-decoration: underline;">
+                    No, Go Back
+                </a>
+            </form>
+        </div>
+
+    </div>
+
 {% endblock %}

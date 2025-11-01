@@ -40,6 +40,14 @@
         </div>
     </nav>
 
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <main class="container">
         {% block content %}
         {% endblock %}
@@ -48,6 +56,29 @@
     <footer class="footer">
         Developed by Shashwat Kumar
     </footer>
+
+    <script>
+        // Wait for the document to be fully loaded
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Find all message elements
+            const messages = document.querySelectorAll('.messages .message');
+            
+            if (messages.length > 0) {
+                // Wait 3 seconds (3000 milliseconds)
+                setTimeout(() => {
+                    messages.forEach((message) => {
+                        // 1. Add the fade-out class to trigger the animation
+                        message.classList.add('fade-out');
+
+                        // 2. After the animation (0.5s), remove the element
+                        setTimeout(() => {
+                            message.remove();
+                        }, 500); // 500ms = 0.5s
+                    });
+                }, 2000); // 3-second delay
+            }
+        });
+    </script>
 
 </body>
 </html>

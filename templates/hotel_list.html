@@ -3,7 +3,19 @@
 {% block title %}All Hotels{% endblock %}
 
 {% block content %}
-    <h2>Our Hotels</h2>
+    
+    <div class="search-container">
+        <form action="{% url 'hotel-list' %}" method="GET" class="search-form">
+            <input type="text" name="q" class="search-input" placeholder="Search by hotel name, city, or state..." value="{{ search_query }}">
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+    </div>
+
+    {% if search_query %}
+        <h2>Showing results for "{{ search_query }}"</h2>
+    {% else %}
+        <h2>Our Hotels</h2>
+    {% endif %}
 
     {% if hotels %}
         <ul class="card-list">
@@ -39,6 +51,12 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>No hotels are available at this time.</p>
+        <p style="text-align: center; font-size: 1.1em;">
+            {% if search_query %}
+                No hotels found matching your search.
+            {% else %}
+                No hotels are available at this time.
+            {% endif %}
+        </p>
     {% endif %}
 {% endblock %}

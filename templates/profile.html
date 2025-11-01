@@ -6,15 +6,39 @@
     
     <div class="content-wrapper-narrow">
 
-        <h2 style="text-align: center; margin-bottom: 30px;">My Profile</h2>
+        <div class="page-header">
+            <h2>My Profile</h2>
+            <<div>
+                <a href="{% url 'edit-profile' %}" class="btn-edit" style="padding: 8px 12px; margin-right: 10px;">
+                    Edit Profile
+                </a>
+                <a href="{% url 'password_change' %}" class="btn-edit" style="padding: 8px 12px;">
+                    Change Password
+                </a>
+            </div>
+        </div>
 
         <div class="profile-info">
             <div class="profile-details-grid">
                 <strong>Email:</strong> <span>{{ user.email }}</span>
                 <strong>Name:</strong> <span>{{ user.first_name }} {{ user.last_name }}</span>
+                
+                {% if user.dateofbirth %}
+                    <strong>Birthday:</strong> <span>{{ user.dateofbirth }}</span>
+                {% endif %}
+                
+                {% if user.city or user.state or user.country %}
+                    <strong>Location:</strong> 
+                    <span>
+                        {{ user.city|default:'' }}
+                        {% if user.city and user.state %}, {% endif %}
+                        {{ user.state|default:'' }}
+                        {% if user.city or user.state %}, {% endif %}
+                        {{ user.country|default:'' }}
+                    </span>
+                {% endif %}
             </div>
         </div>
-
         <div class="profile-info">
             <h3>My Phone Numbers</h3>
             
@@ -37,11 +61,10 @@
                         <span style="text-align: right;">
                             <form action="{% url 'delete-phone' phone.cust.cust_id phone.phone_number %}" method="post" style="display: inline; margin-left: 15px;">
                                 {% csrf_token %}
-                                
-                                <button type.="submit" class="btn-danger-small">
+                                <button type="submit" class="btn-danger-small">
                                     Delete
                                 </button>
-                                </form>
+                            </form>
                         </span>
                     </div>
                 {% endfor %}

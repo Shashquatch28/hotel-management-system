@@ -683,3 +683,158 @@ hr:not(.gold-divider) {
         gap: 20px;
     }
 }
+
+/* --- 25. Page Header with Button --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h2 {
+    margin: 0; /* Remove default margin from h2 */
+}
+
+/* --- 26. Custom Select Dropdown Styling (for Ratings) --- */
+.form-wrapper select {
+    /* Reset basic appearance */
+    -webkit-appearance: none; /* Remove default WebKit styling */
+    -moz-appearance: none;    /* Remove default Mozilla styling */
+    appearance: none;         /* Remove default styling */
+
+    background-color: rgba(0, 0, 0, 0.2); /* Same as your text inputs */
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 12px;
+    font-size: 1em;
+    color: var(--text-color);
+    width: 100%;
+    cursor: pointer;
+    position: relative; /* For the custom arrow */
+    box-sizing: border-box; /* Include padding in width */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Focus state */
+.form-wrapper select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* Custom Arrow */
+.form-wrapper select {
+    /* Add a custom SVG arrow or similar via background-image */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D2B48C'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Position the arrow */
+    background-size: 1.2em; /* Size the arrow */
+    padding-right: 40px; /* Make space for the arrow */
+}
+
+/* Style the options within the dropdown */
+.form-wrapper select option {
+    background-color: var(--bg-color); /* Dark background for options */
+    color: var(--text-color); /* Light text for options */
+    padding: 10px;
+}
+
+/* Hover state for options (some browsers respect this, others don't) */
+.form-wrapper select option:hover {
+    background-color: var(--primary-hover);
+    color: var(--bg-color);
+}
+
+/* --- 24. Flash Message Alerts --- */
+.messages {
+    position: fixed; /* Stays on screen */
+    top: 80px; /* Below the nav bar */
+    right: 20px;
+    z-index: 1000;
+    width: 300px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.message {
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Gold for success */
+.message.success {
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+}
+
+/* Red for errors */
+.message.error {
+    background-color: var(--error-color);
+    color: #fff;
+}
+
+/* A lighter blue for info */
+.message.info {
+    background-color: #2E86C1;
+    color: #fff;
+}
+
+/* --- 25. Flash Message Fade-Out --- */
+.message.fade-out {
+    opacity: 0;
+    transform: translateX(100%);
+    /* This transition must match the JS timeout */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* --- 26. Search Bar Styles --- */
+.search-container {
+    background: var(--container-bg); /* Frosted glass */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 30px;
+}
+
+.search-form {
+    display: flex;
+    gap: 15px; /* Space between input and button */
+}
+
+.search-input {
+    flex-grow: 1; /* Makes the input field take most of the space */
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    padding: 0 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.search-btn:hover {
+    background-color: var(--primary-hover);
+}

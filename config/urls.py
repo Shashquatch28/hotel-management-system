@@ -56,4 +56,19 @@ urlpatterns = [
     path('profile/delete-phone/<int:cust_id>/<str:phone_number>/', 
      booking_views.delete_phone, 
      name='delete-phone'), # URL for Deleting Phone Numbers
+
+    path('profile/edit/', booking_views.edit_profile, name='edit-profile'),
+
+    path('profile/password-change/', 
+         auth_views.PasswordChangeView.as_view(
+             template_name='password_change.html',
+             success_url='done/' # Go to the 'done' URL when successful
+         ), 
+         name='password_change'),
+    
+    path('profile/password-change/done/',
+         auth_views.PasswordChangeDoneView.as_view(
+             template_name='password_change_done.html'
+         ),
+         name='password_change_done'),
 ]

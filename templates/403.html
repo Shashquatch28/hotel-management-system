@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Permission Denied{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper-narrow" style="text-align: center;">
+        <h1 style="color: var(--error-color); font-size: 5em; margin-bottom: 0;">403</h1>
+        <h2>Permission Denied</h2>
+        <p>We're sorry, but you do not have permission to access this page.</p>
+        <a href="{% url 'home' %}" class="btn-cta" style="margin-top: 20px;">Go to Home Page</a>
+    </div>
+{% endblock %}
