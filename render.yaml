@@ -2,10 +2,10 @@ services:
   # 1. The PostgreSQL Database
   - type: pserv
     name: hotel_management_system
-    plan: free 
+    plan: free
     databaseName: hms_db
     user: hms_user
-    postgresMajorVersion: "16" 
+    postgresMajorVersion: "16"
 
   # 2. The Django Web Application
   - type: web
@@ -24,6 +24,6 @@ services:
           name: hotel_management_system
           property: connectionString
       - key: SECRET_KEY
-        generateValue: true 
+        generateValue: true
       - key: PYTHON_VERSION
-        value: "3.12.3" 
+        value: "3.12.3"
