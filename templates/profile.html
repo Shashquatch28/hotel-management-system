@@ -9,29 +9,44 @@
         <h2 style="text-align: center; margin-bottom: 30px;">My Profile</h2>
 
         <div class="profile-info">
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <div class="profile-details-grid">
+                <strong>Email:</strong> <span>{{ user.email }}</span>
+                <strong>Name:</strong> <span>{{ user.first_name }} {{ user.last_name }}</span>
+            </div>
         </div>
 
         <div class="profile-info">
             <h3>My Phone Numbers</h3>
+            
+            <div class="phone-list-grid" style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px; border-bottom: 2px solid var(--primary-color);">
+                <span>Phone Number</span>
+                <span>Status</span>
+                <span style="text-align: right;">Action</span>
+            </div>
+            
             {% if phones %}
-                <ul>
-                    {% for phone in phones %}
-                        <li>
-                            {{ phone.phone_number }} 
-                            {% if phone.is_primary %}<span style="color: var(--primary-color);">(Primary)</span>{% endif %}
+                {% for phone in phones %}
+                    <div class="phone-list-grid">
+                        
+                        <span>{{ phone.phone_number }}</span>
+                        
+                        <span class="phone-status">
+                            {% if phone.is_primary %}(Primary){% endif %}
+                        </span>
+                        
+                        <span style="text-align: right;">
                             <form action="{% url 'delete-phone' phone.cust.cust_id phone.phone_number %}" method="post" style="display: inline; margin-left: 15px;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn-cancel" style="padding: 0 5px; font-size: 0.9em; border: none; background: none;">
-                                    (Delete)
+                                
+                                <button type.="submit" class="btn-danger-small">
+                                    Delete
                                 </button>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                </form>
+                        </span>
+                    </div>
+                {% endfor %}
             {% else %}
-                <p>You have not added any phone numbers.</p>
+                <p style="padding-top: 15px; font-size: 0.9em;">You have not added any phone numbers.</p>
             {% endif %}
         </div>
 

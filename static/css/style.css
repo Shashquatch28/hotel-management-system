@@ -9,7 +9,8 @@
     --heading-color: #ffffff;   /* Pure White (for headings) */
     
     --primary-color: #D2B48C;    /* Tan/Gold (for buttons, links) */
-    --primary-hover: #D2B48C;    /* Lighter Gold on hover */
+    --primary-hover: #E0C7A6;    /* A Lighter Gold for hover */
+    --primary-color-rgb: 210, 180, 140; /* RGB version for shadow */
     
     --border-color: rgba(210, 180, 140, 0.2); /* Faint Gold Border */
     --error-color: #e57373;      /* Light red for dark mode */
@@ -156,10 +157,6 @@ hr {
 .auth-form-wrapper h2 {
     color: var(--heading-color);
 }
-@media (max-width: 768px) {
-    .auth-card { flex-direction: column; }
-    .auth-graphic { display: none; }
-}
 
 /* --- 5. Form & Button Styles (Dark Mode) --- */
 .form-wrapper {
@@ -195,11 +192,18 @@ hr {
     color: var(--text-color);
     position: relative;
 }
+
+/* FIXED: Added missing comma */
 .form-wrapper input:focus,
-.form-wrapper textarea:focus {
+.form-wrapper textarea:focus,
+.form-wrapper input:invalid:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 5px rgba(210, 180, 140, 0.3); /* Gold glow */
+    /* FIXED: Using the new RGB variable */
+    box-shadow: 0 0 5px rgba(var(--primary-color-rgb), 0.3);
+}
+.form-wrapper input:invalid {
+    box-shadow: none;
 }
 .form-wrapper .helptext {
     font-size: 0.85em;
@@ -235,7 +239,7 @@ hr {
     transform: translateY(-2px);
 }
 
-/* --- 6. Card Styles (MODIFIED) --- */
+/* --- 6. Card Styles --- */
 .card-list {
     list-style: none;
     padding: 0;
@@ -250,13 +254,11 @@ hr {
     color: var(--bg-color); 
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    /* We'll let the content define the height, no min-height */
     display: flex;       
     flex-direction: column; 
     transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
-    /* Remove padding from the card itself */
     padding: 0; 
-    overflow: hidden; /* This is key for the rounded corners */
+    overflow: hidden; 
 }
 
 .card:hover {
@@ -264,12 +266,11 @@ hr {
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* This container holds the text content below the slider */
 .card-content {
-    padding: 20px; /* Add padding here instead of on the card */
+    padding: 20px; 
     flex-grow: 1; 
     display: flex;
-    flex-direction: column; /* Stack content */
+    flex-direction: column;
 }
 
 .card-content h3 {
@@ -279,11 +280,10 @@ hr {
 
 .card-content p {
     font-size: 0.9em;
-    opacity: 0.8; /* Make secondary text slightly faded */
-    flex-grow: 1; /* Pushes the button to the bottom */
+    opacity: 0.8;
+    flex-grow: 1; 
 }
 
-/* Make sure links in the text are dark */
 .card-content a {
     color: var(--bg-color);
 }
@@ -292,39 +292,16 @@ hr {
     text-decoration: underline;
 }
 
-/* --- Card Slider & Placeholder --- */
+/* --- 7. Card Slider & Placeholder --- */
 .card-slider {
     width: 100%;
     height: 200px;
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;  
-    border-radius: 5px; /* Keep outer border radius */
+    overflow-x: auto;   
+    border-radius: 5px;
     margin-bottom: 15px;
     scroll-snap-type: x mandatory;
-
-    /* --- Custom Scrollbar Styles (for WebKit browsers) --- */
-    /* Make scrollbar track transparent */
-    &::-webkit-scrollbar {
-        height: 6px; /* Height of the horizontal scrollbar */
-        background-color: transparent;
-    }
-
-    /* Style the thumb */
-    &::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.2); /* Light, transparent gold/white */
-        border-radius: 3px;
-    }
-
-    /* Style the thumb on hover */
-    &::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(255, 255, 255, 0.4); /* Slightly more visible on hover */
-    }
-
-    /* Hide the track completely for a cleaner look */
-    &::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
 }
 
 .card-slider img {
@@ -332,7 +309,6 @@ hr {
     height: 100%;
     object-fit: cover; 
     scroll-snap-align: start;
-    /* Ensure images fill the slider without extra space */
     flex-shrink: 0; 
 }
 
@@ -348,35 +324,47 @@ hr {
     font-size: 0.9em;
 }
 
-/* --- 7. Hero Section (for Home Page) --- */
+/* --- 8. Custom Scrollbar (FIXED SASS SYNTAX) --- */
+.card-slider::-webkit-scrollbar {
+    height: 6px;
+    background-color: transparent;
+}
+.card-slider::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.card-slider::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+.card-slider::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* --- 9. Hero Section --- */
 .hero {
     text-align: center;
-    /* Use a slightly different 'glass' effect */
     background-color: transparent; 
     padding: 60px 30px;
     border-radius: 8px;
     margin-bottom: 20px;
-
     animation: fadeIn 2s ease-in-out;
 }
-
 .hero h1 {
-    font-size: 2.8em; /* Much larger title */
+    font-size: 2.8em; 
     margin-bottom: 10px;
     color: var(--heading-color);
     font-weight: 700;
 }
-
 .hero p {
     font-size: 1.2em;
     color: var(--text-color);
     margin-bottom: 30px;
 }
 
-/* --- 8. Call to Action (CTA) Button Styles --- */
+/* --- 10. Call to Action (CTA) Button Styles --- */
 .btn-cta {
-    background-color: var(--primary-color); /* Gold/Tan */
-    color: var(--bg-color); /* Midnight Blue text */
+    background-color: var(--primary-color);
+    color: var(--bg-color);
     padding: 14px 28px;
     border: none;
     border-radius: 5px;
@@ -389,23 +377,22 @@ hr {
     margin: 5px 10px;
 }
 .btn-cta:hover {
-    background-color: var(--primary-hover); /* Lighter Gold */
+    background-color: var(--primary-hover);
     transform: translateY(-2px);
     text-decoration: none;
+    color: var(--bg-color) !important; 
 }
-/* A secondary button style (e.g., for 'Register') */
 .btn-cta-secondary {
     background-color: transparent;
-    color: var(--primary-color); /* Gold/Tan text */
+    color: var(--primary-color);
     border: 2px solid var(--primary-color);
-    /* all other styles inherited from .btn-cta */
 }
 .btn-cta-secondary:hover {
     background-color: var(--primary-color);
-    color: var(--bg-color); /* Text flips to blue on hover */
-}   
+    color: var(--bg-color) !important;
+}
 
-/* --- 9. ADD THIS AT THE BOTTOM: Animations --- */
+/* --- 11. Animations --- */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -417,50 +404,29 @@ hr {
     }
 }
 
-/* --- 10. Special Divider --- */
+/* --- 12. Special Divider --- */
 .gold-divider {
-    width: 100px; /* Short, not full-width */
+    width: 100px;
     height: 2px;
-    background-color: #D4AF37; /* Your gold color */
+    background-color: #D4AF37;
     border: none;
-    margin: 10px auto 20px auto; /* Center it */
+    margin: 10px auto 20px auto;
 }
 
-/* --- 11. Minimalist Footer --- */
+/* --- 13. Minimalist Footer --- */
 .footer {
     text-align: center;
     padding: 20px 0;
     margin-top: 30px;
     font-size: 0.9em;
-    color: rgba(255, 255, 255, 0.4); /* Subtle, light text */
+    color: rgba(255, 255, 255, 0.4);
 }
 
-/* --- 12. Image Placeholder --- */
-.image-placeholder {
-    width: 100%;
-    height: 200px; /* Same height as the slider */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0,0,0,0.1); /* Dark, subtle background */
-    border-radius: 5px;
-    margin-bottom: 15px;
-    color: var(--bg-color); /* Midnight Blue text */
-    font-style: italic;
-    font-size: 0.9em;
-}
-
-/* --- 13. Card Button --- */
+/* --- 14. Card Button --- */
 .btn-card {
     display: inline-block;
-    background-color: var(--bg-color); /* Midnight Blue background */
-    
-    /* THIS IS THE FIX: 
-      We explicitly set the text color to Gold.
-      It was inheriting the dark link color before.
-    */
+    background-color: var(--bg-color);
     color: var(--primary-color) !important;       
-
     padding: 10px 15px;
     border: 1px solid var(--bg-color);
     border-radius: 5px;
@@ -469,70 +435,57 @@ hr {
     font-weight: 600;
     text-decoration: none;
     text-align: center;
-    margin-top: 15px; /* More space */
+    margin-top: 15px; 
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
-
 .btn-card:hover {
     background-color: var(--primary-hover);
-    color: var(--bg-color) !important; /* Inverted on hover */
+    color: var(--bg-color) !important; 
     text-decoration: none;
     border-color: var(--primary-hover);
 }
 
-/* --- 13. Page Content Wrappers --- */
+/* --- 15. Page Content Wrappers --- */
 .content-wrapper-narrow {
-    max-width: 700px; /* Set a comfortable max width */
-    margin: 0 auto;   /* Center it */
+    max-width: 700px; 
+    margin: 0 auto;   
 }
 
-/* --- 14. Hotel Detail Grid Layout --- */
+/* --- 16. Hotel Detail Grid Layout --- */
 .hotel-detail-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Main content 2x width of sidebar */
-    gap: 40px; /* Space between columns */
-    max-width: 1200px; /* Max width for the entire grid */
-    margin: 0 auto; /* Center the grid */
-    padding: 20px 0; /* Vertical padding */
-
-    /* Responsive adjustment for smaller screens */
-    @media (max-width: 900px) {
-        grid-template-columns: 1fr; /* Single column on small screens */
-        gap: 20px;
-    }
+    grid-template-columns: 2fr 1fr;
+    gap: 40px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 20px 0; 
 }
-
 .main-content-column {
     display: flex;
     flex-direction: column;
     gap: 30px; 
 }
-
 .sidebar-column {
     display: flex;
     flex-direction: column;
     gap: 30px; 
 }
-
-
 .section-content {
-    padding: 25px; /* Unified padding */
-    background: var(--container-bg); /* Frosted glass background */
+    padding: 25px; 
+    background: var(--container-bg); 
     border: 1px solid var(--border-color);
     border-radius: 8px;
     flex-grow: 1; 
 }
-
 .section-content h2 {
     margin-top: 0;
     padding-bottom: 15px;
-    color: var(--primary-color); /* Gold */
+    color: var(--primary-color);
     font-size: 1.5em;
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color); /* Gold line */
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 20px;
 }   
-
 .hotel-detail-header {
     text-align: center; 
     margin-bottom: 40px; 
@@ -543,15 +496,11 @@ hr {
 .hotel-detail-header h1 {
     font-size: 3em; 
 }
-
-/* Small adjustment for the form in the sidebar */
 .sidebar-column .review-form {
-    margin-top: 0; /* Remove extra margin from review form */
+    margin-top: 0; 
 }
-
-/* Make sure the review form inputs look good */
 .review-form p {
-    margin-bottom: 15px; /* Space between form fields */
+    margin-bottom: 15px; 
 }
 .review-form label {
     display: block;
@@ -566,9 +515,9 @@ hr {
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.05); /* Very subtle input background */
+    background-color: rgba(255, 255, 255, 0.05); 
     color: var(--text-color);
-    box-sizing: border-box; /* Include padding in width */
+    box-sizing: border-box; 
 }
 .review-form input[type="text"]:focus,
 .review-form input[type="number"]:focus,
@@ -581,53 +530,33 @@ hr {
     min-height: 80px;
     resize: vertical;
 }
-
-/* Adjust list item spacing in .info-list */
 .info-list li {
-    padding: 15px; /* More padding for list items */
+    padding: 15px;
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 .info-list li strong {
-    color: var(--primary-color); /* Highlight strong text */
+    color: var(--primary-color);
 }
-
-/* Remove the default hr, as we'll use a gold-divider class now */
 hr:not(.gold-divider) {
     display: none;
 }
 
-/* --- 15. Date Picker Fix --- */
-.form-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-    background: transparent;
-    color: transparent; /* Makes the original icon invisible */
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* Optional: Style the internal calendar button (WebKit only) */
+/* --- 17. Date Picker Fix (REMOVED CONFLICTING RULE) --- */
 .form-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--primary-color); /* Makes the calendar icon gold */
-    opacity: 1; /* Ensures it is not transparent */
-    display: block; /* Ensures it is always rendered */
+    opacity: 1; 
+    display: block; 
     cursor: pointer;
 }
 
-/* --- 16. Booking Status and Action Links --- */
+/* --- 18. Booking Status and Action Links --- */
 .status-confirmed {
-    /* Use the dark Midnight Blue for maximum contrast */
     color: var(--bg-color); 
     font-weight: 600;
 }
 .status-pending {
-    /* Use the dark Midnight Blue for maximum contrast */
     color: var(--bg-color); 
     font-weight: 600;
 }
@@ -645,30 +574,27 @@ hr:not(.gold-divider) {
     background-color: var(--primary-hover);
 }
 .btn-cancel {
-    /* Use dark red/error color for visibility */
     color: var(--bg-color); 
     font-weight: 500;
     margin-left: 10px;
     font-size: 0.9em;
-    text-decoration: underline; /* Added underline for clarity */
+    text-decoration: underline; 
 }
 .btn-cancel:hover {
-    color: var(--error-color); /* Highlight red on hover */
+    color: var(--error-color); 
 }
 
-/* --- 17. My Profile Specific Styles --- */
+/* --- 19. My Profile Specific Styles --- */
 .profile-info {
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 1px dashed var(--border-color); /* Subtle divider */
+    border-bottom: 1px dashed var(--border-color); 
 }
-
 .profile-info h3 {
     color: var(--primary-color);
     font-size: 1.3em;
     margin-top: 0;
 }
-
 .profile-info ul {
     list-style: none;
     padding: 0;
@@ -679,4 +605,81 @@ hr:not(.gold-divider) {
     border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     font-size: 1.1em;
+}
+
+/* --- 20. Profile Layout Cleanup --- */
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr; 
+    gap: 10px 30px; 
+    margin-bottom: 25px;
+    font-size: 1.1em;
+}
+.profile-details-grid strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+.phone-list-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr; 
+    gap: 15px;
+    align-items: center;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+    padding: 10px 0;
+}
+.phone-list-grid:last-child {
+    border-bottom: none;
+}
+.phone-status {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+/* --- 21. Small Danger Button --- */
+.btn-danger-small {
+    background-color: #c9302c; 
+    color: #fff !important; 
+    padding: 4px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.btn-danger-small:hover {
+    background-color: #a94442;
+    color: #fff !important;
+    text-decoration: none;
+}
+
+/* --- 22. Centered Nav Bar --- */
+.main-nav.nav-centered {
+    justify-content: center;
+}
+.main-nav.nav-centered .nav-right {
+    display: none; 
+}
+
+/* --- 23. Form Field-Specific Errors --- */
+.form-wrapper .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    color: var(--error-color); 
+    font-weight: 500;
+    font-size: 0.9em;
+}
+.form-wrapper .errorlist li {
+    padding: 2px 0;
+}
+
+/* --- 24. Media Query Fix (FIXED SASS SYNTAX) --- */
+@media (max-width: 900px) {
+    .hotel-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 }

@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <nav class="main-nav">
+    <nav class="main-nav {% if not user.is_authenticated and request.path == '/' %}nav-centered{% endif %}">
         <a href="{% url 'home' %}" style="font-weight: bold; font-size: 1.2em;">HotelSystem</a>
         
         {% if user.is_authenticated %}
@@ -30,8 +30,12 @@
                 </form>
                 <span>(Hello, {{ user.first_name }})</span>
             {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                <a href="{% url 'register' %}">Register</a>
+                
+                {% if request.path != '/' %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'register' %}">Register</a>
+                {% endif %}
+
             {% endif %}
         </div>
     </nav>
