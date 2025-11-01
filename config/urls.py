@@ -53,7 +53,7 @@ urlpatterns = [
         
     path('profile/', booking_views.profile, name='profile'), # URL for User Profile
 
-    path('profile/delete-phone/<int:phone_id>/', 
-         booking_views.delete_phone, 
-         name='delete-phone'), # URL for Deleting Phone Numbers
+    path('profile/delete-phone/<int:cust_id>/<str:phone_number>/', 
+     booking_views.delete_phone, 
+     name='delete-phone'), # URL for Deleting Phone Numbers
 ]

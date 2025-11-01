@@ -21,8 +21,7 @@
                         <li>
                             {{ phone.phone_number }} 
                             {% if phone.is_primary %}<span style="color: var(--primary-color);">(Primary)</span>{% endif %}
-                            
-                            <form action="{% url 'delete-phone' phone.pk %}" method="post" style="display: inline; margin-left: 15px;">
+                            <form action="{% url 'delete-phone' phone.cust.cust_id phone.phone_number %}" method="post" style="display: inline; margin-left: 15px;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-cancel" style="padding: 0 5px; font-size: 0.9em; border: none; background: none;">
                                     (Delete)

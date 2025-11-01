@@ -231,21 +231,24 @@ def profile(request):
 
 # View to Delete Phone
 @login_required
-def delete_phone(request, phone_id):
-    # Find the phone number
-    phone = get_object_or_404(CustomerPhone, pk=phone_id)
+def delete_phone(request, cust_id, phone_number): # <--- Accepts two arguments
+    # 1. Use both fields to find the unique phone number
+    phone = get_object_or_404(
+        CustomerPhone, 
+        cust_id=cust_id, 
+        phone_number=phone_number
+    )
 
-    # CRITICAL: Check if the logged-in user is the owner
+    # 2. CRITICAL: Check if the logged-in user is the owner
     if phone.cust != request.user:
         return HttpResponseForbidden("You are not allowed to delete this phone number.")
 
     # We only want to delete if the form is POSTed
     if request.method == 'POST':
         phone.delete()
-        # Redirect back to the profile page
         return redirect('profile')
     
-    # If it's a GET request, just show a confirmation page
+    # If it's a GET request, show confirmation
     context = {
         'phone': phone
     }

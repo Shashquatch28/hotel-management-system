@@ -78,14 +78,21 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 # ---------------------------------- Customer Phone Model ----------------------------------
 class CustomerPhone(models.Model):
-    pk = models.CompositePrimaryKey('cust', 'phone_number')
-    cust = models.ForeignKey(Customer, models.CASCADE, db_column='Cust_ID')  # Field name made lowercase.
-    phone_number = models.CharField(db_column='Phone_Number', max_length=20)  # Field name made lowercase.
-    is_primary = models.BooleanField(db_column='Is_Primary', blank=True, null=True)  # Field name made lowercase.
+    # 1. Trick: Define one of the fields as the primary key
+    #    BUT make it nullable, which tells Django not to manage it
+    cust = models.ForeignKey(Customer, models.CASCADE, db_column='Cust_ID', primary_key=True) 
+    
+    # 2. Define the other field normally
+    phone_number = models.CharField(db_column='Phone_Number', max_length=20) 
+    
+    # 3. The other field
+    is_primary = models.BooleanField(db_column='Is_Primary', blank=True, null=True) 
 
     class Meta:
         managed = False
         db_table = 'customer_phone'
+        # 4. Re-establish the unique constraint
+        unique_together = (('cust', 'phone_number'),)
 
 
 # ---------------------------------- Facility Model ----------------------------------
