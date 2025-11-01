@@ -3,13 +3,15 @@ services:
   - type: pserv
     name: hotel_management_system
     plan: free
-    env: postgres
+    # DO NOT add a 'runtime' key here.
+    # We also remove 'databaseName', 'user', and 'postgresMajorVersion'
+    # as Render will create defaults for the free plan.
 
   # 2. The Django Web Application
   - type: web
     name: hotel_management_system_app
     plan: free
-    runtime: python
+    runtime: python # The 'runtime' key belongs here
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
@@ -17,6 +19,11 @@ services:
     startCommand: "gunicorn config.wsgi"
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
+        fromService:
+          type: pserv
           name: hotel_management_system
           property: connectionString
+      - key: SECRET_KEY
+        generateValue: true 
+      - key: PYTHON_VERSION
+        value: "3.12.3"
