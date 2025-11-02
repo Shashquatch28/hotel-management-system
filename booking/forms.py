@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Customer, Booking, Review, CustomerPhone
+from .models import Customer, Booking, Review, CustomerPhone, Cancellation
 import datetime
 
 # --- CustomerCreationForm (no changes) ---
@@ -112,3 +112,17 @@ class CustomerUpdateForm(forms.ModelForm):
         widgets = {
             'dateofbirth': DateInput(),
         }
+
+class CancellationForm(forms.ModelForm):
+    # Make the 'reason' field optional and give it a placeholder
+    reason = forms.CharField(
+        required=False, 
+        widget=forms.Textarea(attrs={
+            'rows': 3, 
+            'placeholder': 'Optional: Please tell us why you are cancelling.'
+        })
+    )
+
+    class Meta:
+        model = Cancellation
+        fields = ['reason']

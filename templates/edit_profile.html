@@ -21,6 +21,14 @@
         <p style="text-align: center; margin-top: 20px;">
             <a href="{% url 'profile' %}">Back to Profile</a>
         </p>
-
+    
+        <hr class="gold-divider" style="margin-top: 30px;">
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: var(--error-color); font-weight: 600;">Danger Zone</p>
+            <a href="{% url 'delete-profile' %}" class="btn-danger-small">
+                Delete My Account
+            </a>
+        </div>
+    
     </div>
-{% endblock %}
+    {% endblock %}

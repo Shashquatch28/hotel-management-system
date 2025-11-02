@@ -1,15 +1,16 @@
 from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.db.models import Q
 from .forms import (
     CustomerCreationForm, BookingForm, ReviewForm, CustomerPhoneForm, 
-    CustomerUpdateForm
+    CustomerUpdateForm, CancellationForm
 )
 from .models import (
-    Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage, CustomerPhone
+    Hotel, Room, Booking, Payment, Facility, Review, Offer, RoomImage, CustomerPhone, Offer, Cancellation
 )
 import datetime
 
@@ -37,35 +38,44 @@ def register(request):
 
 # Hotel List View
 def hotel_list(request):
-    
-    # 1. Get the search query from the URL (e.g., ?q=Pune)
-    query = request.GET.get('q', '') # Get 'q', or an empty string if it's not there
-    
-    # 2. Start with all hotels, then filter if a query exists
+
+    query = request.GET.get('q', '')
+    # 3. Get the new filter from the URL
+    offer_filter = request.GET.get('filter_offers')
+
+    # 4. Start with all hotels
+    hotels = Hotel.objects.all()
+
+    # 5. Apply the search query first
     if query:
-        hotels = Hotel.objects.filter(
+        hotels = hotels.filter(
             Q(name__icontains=query) |
             Q(city__icontains=query) |
             Q(state__icontains=query)
+        )
+
+    # 6. Apply the offer filter
+    if offer_filter == 'on':
+        today = datetime.date.today()
+        # Filter hotels that have an active offer
+        hotels = hotels.filter(
+            offer__start_date__lte=today,
+            offer__end_date__gte=today
         ).distinct() # .distinct() prevents duplicates
-    else:
-        # If no query, just get all hotels
-        hotels = Hotel.objects.all() 
-    
-    # 3. Get all room images and group them by hotel_id
+
+    # --- (This image logic is the same as before) ---
     all_room_images_query = RoomImage.objects.all()
     all_room_images = defaultdict(list)
     for image in all_room_images_query:
-        # This groups images by the hotel's ID
         all_room_images[image.hotel_id].append(image)
 
-    # 4. Attach the list of images to each hotel object
     for hotel in hotels:
-        hotel.images = all_room_images.get(hotel.hotel_id, []) # Get the list (or an empty list)
+        hotel.images = all_room_images.get(hotel.hotel_id, [])
 
     context = {
-        'hotels': hotels, # Pass the modified hotel objects
-        'search_query': query, # 5. Pass the query back to the template
+        'hotels': hotels,
+        'search_query': query,
+        'offer_filter': offer_filter, # 7. Pass the filter state to the template
     }
     return render(request, 'hotel_list.html', context)
 
@@ -117,11 +127,15 @@ def hotel_detail(request, hotel_id):
 # "My Bookings" View
 @login_required
 def my_bookings(request):
-    # Get bookings only for the currently logged-in user
-    bookings = Booking.objects.filter(cust=request.user)
+    # 1. Get ALL bookings for the user.
+    # 2. Use prefetch_related('payment_set') to efficiently get the payment.
+    bookings = Booking.objects.filter(
+        cust=request.user
+    ).prefetch_related('payment_set').order_by('-checkin')
     
+    # 3. Pass the single 'bookings' list to the template.
     context = {
-        'bookings': bookings
+        'bookings': bookings 
     }
     return render(request, 'my_bookings.html', context)
 
@@ -130,53 +144,31 @@ def my_bookings(request):
 def create_booking(request, hotel_id, room_number):
     room = get_object_or_404(Room, hotel_id=hotel_id, room_number=room_number)
 
-    # Check Room Availability
     if not room.availability:
         return render(request, 'room_not_available.html', {'room': room})
     
     if request.method == 'POST':
-        form = BookingForm(request.POST, room=room) # Pass room for validation
+        # This is Step 1: User submitted the date form
+        form = BookingForm(request.POST, room=room)
         if form.is_valid():
-            booking = form.save(commit=False)
-            booking.cust = request.user      
-            booking.hotel_id = room.hotel_id
-            booking.room_number = room.room_number
-            booking.status = 'Confirmed'
-            booking.bookingdate = datetime.date.today()
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
             
-            booking.save() # Save booking to get an ID
+            # 2. Store the valid dates in the user's session
+            request.session['booking_checkin'] = checkin.isoformat()
+            request.session['booking_checkout'] = checkout.isoformat()
             
-            # Calculate Payment for Booking
-            try:
-                num_nights = (booking.checkout - booking.checkin).days
-                total_price = room.price * num_nights
-
-                Payment.objects.create(
-                    booking=booking,
-                    amount=total_price,
-                    mode='Card',
-                    date=datetime.date.today(),
-                    status='Pending'
-                )
-            except Exception as e:
-                # If payment fails, delete the booking to avoid orphans
-                booking.delete()
-                
-                messages.error(request, 'There was an error processing your payment. Please try again.')
-                # Redirect back to the same form
-                return redirect('create-booking', hotel_id=hotel_id, room_number=room_number)
-
-            messages.success(request, 'Your booking has been confirmed!')
-            return redirect('my-bookings') # Send to "My Bookings" page
+            # 3. Redirect to the new payment confirmation page
+            return redirect('payment-confirmation', hotel_id=hotel_id, room_number=room_number)
     else:
-        form = BookingForm(room=room) # Pass room for validation
+        # This is the GET request (show the date form)
+        form = BookingForm(room=room) 
 
     context = {
         'form': form,
         'room': room,
     }
     return render(request, 'create_booking.html', context)
-
 # View to Cancel Booking
 @login_required
 def cancel_booking(request, booking_id):
@@ -186,26 +178,41 @@ def cancel_booking(request, booking_id):
     if booking.cust != request.user:
         return HttpResponseForbidden("You are not allowed to cancel this booking.")
 
-    if request.method == 'POST':
-
-        try:
-            # Find the related payment
-            payment = Payment.objects.get(booking=booking)
-            payment.status = 'Cancelled'
-            payment.save()
-        except Payment.DoesNotExist:
-            # No payment was found, which is fine.
-            pass
-
-        booking.status = 'Cancelled'
-        booking.save()
-        # You might also want to update the associated Payment status to 'Cancelled'
-        messages.success(request, 'Your booking has been successfully cancelled.')
+    # Check if the booking is already cancelled
+    if booking.status == 'Cancelled':
+        messages.error(request, 'This booking has already been cancelled.')
         return redirect('my-bookings')
+
+    if request.method == 'POST':
+        form = CancellationForm(request.POST)
+        if form.is_valid():
+            # 1. Update Booking status
+            booking.status = 'Cancelled'
+            booking.save()
+            
+            # 2. Update Payment status
+            try:
+                payment = Payment.objects.get(booking=booking)
+                payment.status = 'Cancelled'
+                payment.save()
+            except Payment.DoesNotExist:
+                pass # No payment was found, which is fine
+            
+            # 3. Create the new Cancellation record
+            cancellation = form.save(commit=False)
+            cancellation.booking = booking
+            cancellation.cancel_date = datetime.date.today()
+            cancellation.save()
+            
+            messages.success(request, 'Your booking has been successfully cancelled.')
+            return redirect('my-bookings')
+    else:
+        # GET request: Show the confirmation form
+        form = CancellationForm()
     
-    # If it's a GET request, show a confirmation page
     context = {
-        'booking': booking
+        'booking': booking,
+        'form': form  # Pass the new form to the template
     }
     return render(request, 'cancel_booking.html', context)
 
@@ -264,7 +271,7 @@ def profile(request):
         if form.is_valid():
             phone = form.save(commit=False)
             phone.cust = request.user  # Link the phone to the user
-            phone.save()
+            phone.save(force_insert=True)
             messages.success(request, 'Phone number added successfully.')
             return redirect('profile') # Redirect back to the profile page
     else:
@@ -321,3 +328,101 @@ def delete_phone(request, cust_id, phone_number): # Accepts two arguments
         'phone': phone
     }
     return render(request, 'delete_phone.html', context)
+
+#
+# Delete Profile View
+@login_required
+def delete_profile(request):
+    # We're deleting the user who is currently logged in
+    user = request.user
+
+    if request.method == 'POST':
+        # This is the confirmation
+        user.delete()
+        logout(request) # Log them out as their account is gone
+        messages.success(request, 'Your account has been successfully deleted.')
+        return redirect('home') # Send them to the home page
+
+    # If it's a GET request, just show the confirmation page
+    return render(request, 'delete_profile.html')
+
+# Payment View
+@login_required
+def payment_confirmation(request, hotel_id, room_number):
+    room = get_object_or_404(Room, hotel_id=hotel_id, room_number=room_number)
+    
+    # Get dates from the session
+    checkin_str = request.session.get('booking_checkin')
+    checkout_str = request.session.get('booking_checkout')
+    
+    # If session data is missing, send them back
+    if not checkin_str or not checkout_str:
+        messages.error(request, 'Something went wrong. Please select your dates again.')
+        return redirect('create-booking', hotel_id=hotel_id, room_number=room_number)
+        
+    checkin = datetime.date.fromisoformat(checkin_str)
+    checkout = datetime.date.fromisoformat(checkout_str)
+    
+    # Calculate price
+    num_nights = (checkout - checkin).days
+    subtotal = room.price * num_nights
+    
+    # Find the best active offer
+    today = datetime.date.today()
+    active_offer = Offer.objects.filter(
+        hotel_id=hotel_id,
+        start_date__lte=today,
+        end_date__gte=today
+    ).first() # Get the first valid offer
+    
+    discount = 0
+    if active_offer:
+        discount = subtotal * (active_offer.discount / 100)
+        
+    final_total = subtotal - discount
+
+    # This is Step 2: User confirms the payment
+    if request.method == 'POST':
+        # Create the Booking and Payment
+        try:
+            booking = Booking.objects.create(
+                cust=request.user,
+                hotel_id=room.hotel_id,
+                room_number=room.room_number,
+                bookingdate=today,
+                checkin=checkin,
+                checkout=checkout,
+                status='Confirmed'
+            )
+            
+            Payment.objects.create(
+                booking=booking,
+                amount=final_total, # Save the FINAL discounted price
+                mode='Card',
+                date=today,
+                status='Completed' # Mark as completed
+            )
+            
+            # Clear the session data
+            del request.session['booking_checkin']
+            del request.session['booking_checkout']
+            
+            messages.success(request, 'Your booking is confirmed and payment is complete!')
+            return redirect('my-bookings')
+            
+        except Exception as e:
+            messages.error(request, 'An error occurred while confirming your booking.')
+            return redirect('hotel-detail', hotel_id=hotel_id)
+
+    # This is the GET request: show the confirmation page
+    context = {
+        'room': room,
+        'checkin': checkin,
+        'checkout': checkout,
+        'num_nights': num_nights,
+        'subtotal': subtotal,
+        'active_offer': active_offer,
+        'discount': discount,
+        'final_total': final_total
+    }
+    return render(request, 'payment_confirmation.html', context)

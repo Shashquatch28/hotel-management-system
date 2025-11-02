@@ -18,47 +18,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from booking import views as booking_views  
+from booking import views as booking_views
 
 urlpatterns = [
-    path("admin/", admin.site.urls), # URL for Admin 
+    path('admin/', admin.site.urls),
 
-    path('register/', booking_views.register, name='register'), # URL for User Registration
+    # Home
+    path('', booking_views.home, name='home'),
 
-    path('', booking_views.home, name='home'), 
-
+    # Auth
+    path('register/', booking_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(
-        template_name='login.html' 
+        template_name='login.html'
     ), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'), # URL for Login
-
-    path('hotels/', booking_views.hotel_list, name='hotel-list'),
-
-    path('hotels/<int:hotel_id>/', booking_views.hotel_detail, name='hotel-detail'), # URL for Hotel View
-    
-    path('my-bookings/', booking_views.my_bookings, name='my-bookings'), # URL for Bookings
-
-    path('book-room/<int:hotel_id>/<str:room_number>/', 
-         booking_views.create_booking, 
-         name='create-booking'),  # URL for Creating Bookings
-
-    path('cancel-booking/<int:booking_id>/', 
-         booking_views.cancel_booking, 
-         name='cancel-booking'), # URL for Deleting Bookings
-
-    path('edit-booking/<int:booking_id>/', 
-         booking_views.edit_booking, 
-         name='edit-booking'), # URL for Updating Bookings
-        
-    path('profile/', booking_views.profile, name='profile'), # URL for User Profile
-
-    path('profile/delete-phone/<int:cust_id>/<str:phone_number>/', 
-     booking_views.delete_phone, 
-     name='delete-phone'), # URL for Deleting Phone Numbers
-
-    path('profile/edit/', booking_views.edit_profile, name='edit-profile'),
-
+    # Password Change
     path('profile/password-change/', 
          auth_views.PasswordChangeView.as_view(
              template_name='password_change.html',
@@ -71,4 +46,42 @@ urlpatterns = [
              template_name='password_change_done.html'
          ),
          name='password_change_done'),
+    
+    # Hotel & Room
+    path('hotels/', booking_views.hotel_list, name='hotel-list'),
+    path('hotels/<int:hotel_id>/', booking_views.hotel_detail, name='hotel-detail'),
+
+    # Booking & Payment
+    path('book-room/<int:hotel_id>/<str:room_number>/', 
+         booking_views.create_booking, 
+         name='create-booking'),
+         
+    path('payment-confirmation/<int:hotel_id>/<str:room_number>/', 
+         booking_views.payment_confirmation, 
+         name='payment-confirmation'),
+         
+    path('my-bookings/', booking_views.my_bookings, name='my-bookings'),
+    
+    path('edit-booking/<int:booking_id>/', 
+         booking_views.edit_booking, 
+         name='edit-booking'),
+         
+    path('cancel-booking/<int:booking_id>/', 
+         booking_views.cancel_booking, 
+         name='cancel-booking'),
+
+    # Profile
+    path('profile/', booking_views.profile, name='profile'),
+    
+    path('profile/edit/', 
+         booking_views.edit_profile, 
+         name='edit-profile'),
+         
+    path('profile/delete/', 
+         booking_views.delete_profile, 
+         name='delete-profile'),
+         
+    path('profile/delete-phone/<int:cust_id>/<str:phone_number>/', 
+         booking_views.delete_phone, 
+         name='delete-phone'),
 ]

@@ -12,11 +12,15 @@
             
             <p>Are you sure you want to cancel your booking for Room {{ booking.room_number }} from {{ booking.checkin }} to {{ booking.checkout }}?</p>
 
-            <form method="post" style="margin-top: 20px;">
+            <!-- THIS FORM IS NOW STYLED -->
+            <form method="post" class="form-on-gold">
                 {% csrf_token %}
                 
-                <button type="submit" class="btn-danger-small" style="padding: 10px 20px; font-size: 1em;">
-                    Yes, Cancel
+                <!-- This will render the "Reason" field -->
+                {{ form.as_p }}
+                
+                <button type="submit" class="btn-danger-small" style="padding: 10px 20px; font-size: 1em; margin-top: 10px;">
+                    Yes, Confirm Cancellation
                 </button>
                 
                 <a href="{% url 'my-bookings' %}" style="margin-left: 15px; color: var(--bg-color); text-decoration: underline;">

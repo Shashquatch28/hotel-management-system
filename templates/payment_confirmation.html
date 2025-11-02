@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Payment{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper-narrow">
+        <div class="section-content" style="text-align: center;">
+            
+            <h2>Confirm Your Booking</h2>
+            <p>Please review your booking details before you pay.</p>
+            
+            <hr class="gold-divider" style="margin-bottom: 25px;">
+            
+            <div style="text-align: left; max-width: 400px; margin: auto;">
+                <p><strong>Hotel:</strong> {{ room.hotel.name }}</p>
+                <p><strong>Room:</strong> {{ room.room_number }} ({{ room.roomtype }})</p>
+                <p><strong>Check-in:</strong> {{ checkin }}</p>
+                <p><strong>Check-out:</strong> {{ checkout }}</p>
+                
+                <hr style="border-top: 1px dashed var(--border-color); display: block;">
+                
+                <p>Price per night: ${{ room.price }}</p>
+                <p>Number of nights: {{ num_nights }}</p>
+                <p><strong>Subtotal: ${{ subtotal|floatformat:2 }}</strong></p>
+                
+                {% if active_offer %}
+                    <p style="color: var(--primary-color);">
+                        <strong>"{{ active_offer.description }}" applied:</strong> 
+                        - ${{ discount|floatformat:2 }} ({{ active_offer.discount }}%)
+                    </p>
+                {% endif %}
+                
+                <hr style="border-top: 1px dashed var(--border-color); display: block;">
+                
+                <h3 style="color: var(--heading-color); text-align: right;">
+                    Final Total: ${{ final_total|floatformat:2 }}
+                </h3>
+            </div>
+            
+            <form method="post" style="margin-top: 30px;">
+                {% csrf_token %}
+                <button type.="submit" class="btn" style="width: 100%;">
+                    Confirm & Pay ${{ final_total|floatformat:2 }}
+                </button>
+            </form>
+            
+            <p style="margin-top: 15px;">
+                <a href="{% url 'create-booking' room.hotel_id room.room_number %}">
+                    &larr; Go back and change dates
+                </a>
+            </p>
+
+        </div>
+    </div>
+{% endblock %}

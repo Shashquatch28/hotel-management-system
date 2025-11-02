@@ -4,12 +4,25 @@
 
 {% block content %}
     
-    <div class="search-container">
-        <form action="{% url 'hotel-list' %}" method="GET" class="search-form">
-            <input type="text" name="q" class="search-input" placeholder="Search by hotel name, city, or state..." value="{{ search_query }}">
-            <button type="submit" class="search-btn">Search</button>
-        </form>
-    </div>
+<div class="search-container">
+    <form action="{% url 'hotel-list' %}" method="GET" class="search-form">
+
+        <input type="text" name="q" class="search-input" placeholder="Search by hotel name, city, or state..." value="{{ search_query }}">
+
+        <button type="submit" class="search-btn">Search</button>
+
+        <div class="filter-toggle">
+            <input 
+                type="checkbox" 
+                name="filter_offers" 
+                id="offer-toggle"
+                {% if offer_filter == 'on' %}checked{% endif %}
+            >
+            <label for="offer-toggle">Show Offers Only</label>
+        </div>
+
+    </form>
+</div>
 
     {% if search_query %}
         <h2>Showing results for "{{ search_query }}"</h2>

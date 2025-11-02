@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Profile{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper-narrow">
+
+        <div class="section-content review-form" style="text-align: center; background: var(--primary-color); color: var(--bg-color);">
+
+            <h2 style="color: var(--bg-color);">Confirm Deletion</h2>
+
+            <p>Are you sure you want to permanently delete your account?</p>
+            <p style="font-weight: 600;">This action cannot be undone.</p>
+
+            <form method="post" style="margin-top: 20px;">
+                {% csrf_token %}
+
+                <button type="submit" class="btn-danger-small" style="padding: 10px 20px; font-size: 1em;">
+                    Yes, Delete My Account
+                </button>
+
+                <a href="{% url 'profile' %}" style="margin-left: 15px; color: var(--bg-color); text-decoration: underline;">
+                    No, Go Back
+                </a>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}
